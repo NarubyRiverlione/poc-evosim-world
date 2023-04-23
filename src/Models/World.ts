@@ -2,7 +2,7 @@ import WorldObject from './WorldObject'
 
 
 export default class World {
-  Places: WorldObject[][]
+  private _Places: WorldObject[][]
   SizeX: number
   SizeY: number
 
@@ -10,9 +10,8 @@ export default class World {
     this.SizeX = sizeX
     this.SizeY = sizeY
 
-    this.Places = []
+    this._Places = []
     this.initPlaces()
-
   }
 
   initPlaces() {
@@ -21,14 +20,17 @@ export default class World {
       for (let x = 0; x < this.SizeX; x++) {
         emptyRow.push(new WorldObject())
       }
-      this.Places.push(emptyRow)
+      this._Places.push(emptyRow)
     }
   }
+  GetPlace(x: number, y: number) {
+    return this._Places[y][x]
+  }
   AddObject(x: number, y: number, worldObject: WorldObject) {
-    this.Places[x][y] = worldObject
+    this._Places[y][x] = worldObject
   }
   RemoveObject(x: number, y: number) {
-    this.Places[x][y] = new WorldObject()
+    this._Places[y][x] = new WorldObject()
   }
   RandomCoord() {
     const x = Math.floor(Math.random() * this.SizeX)
@@ -40,7 +42,7 @@ export default class World {
     for (let y = 0; y < this.SizeY; y++) {
       let showRow = ''
       for (let x = 0; x < this.SizeX; x++) {
-        showRow = `${showRow} ${this.Places[y][x].Type}`
+        showRow = `${showRow} ${this._Places[x][y].Type}`
       }
       console.log(`Row ${y} ${showRow}`)
     }

@@ -19,7 +19,7 @@ describe('Food', () => {
     const id = 12345
     const testFood: Food = new Food(x, y, id, testEnergy)
     testWorld.AddObject(x, y, testFood)
-    expect(testWorld.Places[x][y]).toEqual(testFood)
+    expect(testWorld.GetPlace(x, y)).toEqual(testFood)
   })
   it('Eaten = removed for Place', () => {
     const { x, y } = testWorld.RandomCoord()
@@ -28,7 +28,7 @@ describe('Food', () => {
     testWorld.AddObject(x, y, testFood)
     testFood.Eat()
 
-    const testPlace = testWorld.Places[x][y]
+    const testPlace = testWorld.GetPlace(x, y)
     expect(testPlace.Exist).toBeFalsy()
   })
 })
