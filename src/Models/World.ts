@@ -1,10 +1,6 @@
 import WorldObject from './WorldObject'
 
 
-export const EmptyWorldObject: WorldObject =
-  { Type: '', WorldX: -1, WorldY: -1, Exist: false, Id: -1 }
-
-
 export default class World {
   Places: WorldObject[][]
   SizeX: number
@@ -23,7 +19,7 @@ export default class World {
     for (let y = 0; y < this.SizeY; y++) {
       const emptyRow: WorldObject[] = []
       for (let x = 0; x < this.SizeX; x++) {
-        emptyRow.push(EmptyWorldObject)
+        emptyRow.push(new WorldObject())
       }
       this.Places.push(emptyRow)
     }
@@ -32,7 +28,7 @@ export default class World {
     this.Places[x][y] = worldObject
   }
   RemoveObject(x: number, y: number) {
-    this.Places[x][y] = EmptyWorldObject
+    this.Places[x][y] = new WorldObject()
   }
   RandomCoord() {
     const x = Math.floor(Math.random() * this.SizeX)

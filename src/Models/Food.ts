@@ -1,16 +1,12 @@
-import { CstWorld, CstWorldObjects } from '../Cst'
+import { CstWorldObjects } from '../Cst'
 import WorldObject from './WorldObject'
 
-export default class Food implements WorldObject {
-  Type: string
-  Name?: string
-  Id: number
-  WorldX: number
-  WorldY: number
+export default class Food extends WorldObject {
   Energy: number
-  Exist: boolean
 
-  constructor(x: number, y: number, id: number, energy = CstWorld.Food.Energy) {
+
+  constructor(x: number, y: number, id: number, energy: number) {
+    super()
     this.Type = CstWorldObjects.Food
     this.Id = id
     this.Exist = true

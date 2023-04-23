@@ -6,10 +6,10 @@ const StartWorld = new World(CstWorld.Size.X, CstWorld.Size.Y)
 
 const FoodItems: Food[] = []
 
-for (let i = 0; i < CstWorld.Food.StartAmount; i++) {
+for (let id = 0; id < CstWorld.Food.StartAmount; id++) {
   const { x, y } = StartWorld.RandomCoord()
-  FoodItems[i] = new Food(x, y, i)
-  StartWorld.AddObject(x, y, FoodItems[i])
+  FoodItems[id] = new Food(x, y, id, CstWorld.Food.Energy)
+  StartWorld.AddObject(x, y, FoodItems[id])
 }
 
 StartWorld.ShowAll()

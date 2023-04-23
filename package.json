@@ -43,6 +43,9 @@
     "modulePathIgnorePatterns": [
       "<rootDir>/dist/"
     ],
+    "testMatch": [
+      "**/?(*.)+(spec|test).+(ts|tsx|js)"
+    ],
     "coverageReporters": [
       "json-summary",
       "text",
