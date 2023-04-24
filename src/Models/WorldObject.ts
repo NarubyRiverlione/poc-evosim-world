@@ -5,7 +5,8 @@ export interface IWorldObject {
   Id: number,
   Name?: string,
   Exist: boolean,
-  Energy: number
+  Energy: number,
+  IsWandering: boolean
 }
 
 export type WorldObjectStart = {
@@ -23,14 +24,16 @@ export default class WorldObject implements IWorldObject {
   Name?: string | undefined
   Exist: boolean
   Energy: number
+  IsWandering: boolean
 
-  constructor(startValues: WorldObjectStart, type: string) {
+  constructor(startValues: WorldObjectStart, type: string, IsWandering = false) {
     this.Type = type
     this.Id = startValues.Id
     this.Exist = true
     this.WorldX = startValues.WorldX
     this.WorldY = startValues.WorldY
     this.Energy = startValues.Energy
+    this.IsWandering = IsWandering
   }
 
   Thick() {

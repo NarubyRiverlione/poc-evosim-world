@@ -11,4 +11,8 @@ export default class Food extends WorldObject {
   Eat() {
     this.Energy = 0
   }
+
+  Thick(): void {
+    super.Thick()
+  }
 }

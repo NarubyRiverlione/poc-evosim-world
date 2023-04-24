@@ -14,6 +14,7 @@ export default class Wandering {
   }
 
 
+
   NewLocation(worldObject: WorldObject) {
     // step done, new direction
     // TODO dry new wandering vs constructor

@@ -75,4 +75,14 @@ describe('World', () => {
       expect(fout.message).toBe('Invalid size for Y when creating world')
     }
   })
+  it('Guard size below 0', () => {
+    const { checkedX, checkedY } = testWorld.Guard(- 1, -1)
+    expect(checkedX).toBe(0)
+    expect(checkedY).toBe(0)
+  })
+  it('Guard size above world size', () => {
+    const { checkedX, checkedY } = testWorld.Guard(testSizeX + 1, testSizeY + 1)
+    expect(checkedX).toBe(testSizeX)
+    expect(checkedY).toBe(testSizeY)
+  })
 })

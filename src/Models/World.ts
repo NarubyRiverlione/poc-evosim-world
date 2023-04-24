@@ -41,19 +41,6 @@ export default class World {
     return { x, y }
   }
 
-  // TODO is visualisatie --> apart bestand of project
-  /* istanbul ignore next */
-  ShowAll() {
-    for (let y = 0; y < this.SizeY; y++) {
-      let showRow = ''
-      for (let x = 0; x < this.SizeX; x++) {
-        showRow = `${showRow} ${this._Places[x][y]?.Type ?? ' '}`
-      }
-      console.log(`Row ${y} ${showRow}`)
-    }
-  }
-
-
   Thick() {
     // Thick all existing WorldObjects
     for (let y = 0; y < this.SizeY; y++) {
@@ -62,10 +49,45 @@ export default class World {
         if (!worldObject) continue
 
         worldObject.Thick()
+        // don't wander of the world
+        const { checkedX, checkedY } = this.Guard(worldObject.WorldX, worldObject.WorldY)
+        worldObject.WorldX = checkedX; worldObject.WorldY = checkedY
+
+        // is wander around = remove previous location, add new location
+        if (worldObject.IsWandering) {
+          this.RemoveObject(x, y)
+          this.AddObject(worldObject.WorldX, worldObject.WorldY, worldObject)
+        }
+
+        // remove World object without energy
         if (worldObject.Energy <= 0) { this.RemoveObject(x, y) }
       }
 
     }
   }
 
+  Guard(x: number, y: number) {
+    let checkedX = x
+    let checkedY = y
+    if (x < 0) checkedX = 0
+    if (y < 0) checkedY = 0
+    if (x > this.SizeX) checkedX = this.SizeX
+    if (y > this.SizeY) checkedY = this.SizeY
+
+    return { checkedX, checkedY }
+  }
+
+  // TODO is visualisatie --> apart bestand of project
+  /* istanbul ignore next */
+  ShowAll(simThick: number) {
+    console.log(`+++ SIM STEP ${simThick} +++++`)
+    for (let y = 0; y < this.SizeY; y++) {
+      let showRow = ''
+      for (let x = 0; x < this.SizeX; x++) {
+        showRow = `${showRow} ${this._Places[x][y]?.Type ?? ' '}${this._Places[x][y]?.Id ?? ''}`
+      }
+      console.log(`Row ${y} ${showRow}`)
+    }
+    console.log('')
+  }
 }
