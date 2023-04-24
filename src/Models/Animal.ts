@@ -3,8 +3,7 @@ import Wandering from './Wandering'
 import WorldObject from './WorldObject'
 
 export default class Animal extends WorldObject {
-  Energy: number
-  Steps: Wandering | null
+  WanderingSteps: Wandering | null
 
   constructor(x: number, y: number) {
     super()
@@ -12,14 +11,14 @@ export default class Animal extends WorldObject {
     this.WorldX = x
     this.WorldY = y
     this.Energy = CstWorld.Animal.StartEnergy
-    this.Steps = null
+    this.WanderingSteps = null
   }
 
   StartWandering() {
-    this.Steps = new Wandering(CstWorld.Animal.RandomSteps)
+    this.WanderingSteps = new Wandering(CstWorld.Animal.RandomSteps)
   }
   StopWandering() {
-    this.Steps = null
+    this.WanderingSteps = null
   }
 
 }

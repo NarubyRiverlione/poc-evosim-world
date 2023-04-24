@@ -2,8 +2,6 @@ import { CstWorldObjects } from '../Cst'
 import WorldObject from './WorldObject'
 
 export default class Food extends WorldObject {
-  Energy: number
-
 
   constructor(x: number, y: number, id: number, energy: number) {
     super()

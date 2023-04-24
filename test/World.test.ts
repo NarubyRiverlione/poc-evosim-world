@@ -15,12 +15,9 @@ describe('World', () => {
     const { SizeX, SizeY } = testWorld
     expect(SizeX).toBe(testSizeX)
     expect(SizeY).toBe(testSizeY)
-    // expect(testWorld._Places.length).toBe(testSizeY)
 
     for (let y = 0; y < testSizeY; y++) {
-      // expect(testWorld._Places[y].length).toBe(testSizeX)
       for (let x = 0; x < testSizeX; x++) {
-        // console.log(`${x}/${testSizeX}-${y}/${testSizeY}`)
         expect(testWorld.GetPlace(x, y)).toEqual(new WorldObject())
       }
     }
@@ -33,17 +30,17 @@ describe('World', () => {
   })
   it('Place World object', () => {
     const { x, y } = testWorld.RandomCoord()
-    const testWorldObject: WorldObject = { Type: 'TEST', WorldX: x, WorldY: y, Exist: true, Id: 1234 }
+    const testWorldObject: WorldObject = { Type: 'TEST', WorldX: x, WorldY: y, Exist: true, Id: 1234, Energy: 100 }
     testWorld.AddObject(x, y, testWorldObject)
     expect(testWorld.GetPlace(x, y)).toEqual(testWorldObject)
   })
   it('Remove World object', () => {
     const { x, y } = testWorld.RandomCoord()
-    const testWorldObject: WorldObject = { Type: 'TEST', WorldX: x, WorldY: y, Exist: true, Id: 1234 }
+    const testWorldObject: WorldObject = { Type: 'TEST', WorldX: x, WorldY: y, Exist: true, Id: 1234, Energy: 100 }
     testWorld.AddObject(x, y, testWorldObject)
     testWorld.RemoveObject(x, y)
 
-    expect(testWorld.GetPlace(x, y)).toEqual(new WorldObject())
+    expect(testWorld.GetPlace(x, y)).toBeNull()
   })
 
 })

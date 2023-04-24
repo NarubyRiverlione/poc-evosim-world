@@ -14,9 +14,7 @@ export default class Wandering {
   }
 
 
-  NewLocation(worldObject: WorldObject, energy: number) {
-    // only if the is energy
-    if (energy === 0) return
+  NewLocation(worldObject: WorldObject) {
     // step done, new direction
     // TODO dry new wandering vs constructor
     if (this.Steps === 0) {

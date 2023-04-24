@@ -23,10 +23,11 @@ describe('Wandering', () => {
     const { Steps, DirectionX, DirectionY } = testWandering
 
     for (let steps = 1; steps < Steps; steps++) {
-      testWandering.NewLocation(testWorldObject, 100)
+      testWandering.NewLocation(testWorldObject)
       expect(testWorldObject.WorldX).toBe(100 + DirectionX * steps)
       expect(testWorldObject.WorldY).toBe(100 + DirectionY * steps)
       expect(Steps).toBeGreaterThanOrEqual(0)
     }
   })
+
 })

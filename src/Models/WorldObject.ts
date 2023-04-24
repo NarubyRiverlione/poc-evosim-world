@@ -4,7 +4,8 @@ interface IWorldObject {
   WorldY: number
   Id: number,
   Name?: string,
-  Exist: boolean
+  Exist: boolean,
+  Energy: number
 }
 
 
@@ -15,6 +16,7 @@ export default class WorldObject implements IWorldObject {
   Id: number
   Name?: string | undefined
   Exist: boolean
+  Energy: number
 
   constructor() {
     this.Type = ''
@@ -22,5 +24,6 @@ export default class WorldObject implements IWorldObject {
     this.Exist = false
     this.WorldX = -1
     this.WorldY = -1
+    this.Energy = 0
   }
 }

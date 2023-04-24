@@ -2,7 +2,7 @@ import WorldObject from './WorldObject'
 
 
 export default class World {
-  private _Places: WorldObject[][]
+  private _Places: (WorldObject | null)[][]
   SizeX: number
   SizeY: number
 
@@ -30,7 +30,7 @@ export default class World {
     this._Places[y][x] = worldObject
   }
   RemoveObject(x: number, y: number) {
-    this._Places[y][x] = new WorldObject()
+    this._Places[y][x] = null // new WorldObject()
   }
   RandomCoord() {
     const x = Math.floor(Math.random() * this.SizeX)
@@ -42,7 +42,7 @@ export default class World {
     for (let y = 0; y < this.SizeY; y++) {
       let showRow = ''
       for (let x = 0; x < this.SizeX; x++) {
-        showRow = `${showRow} ${this._Places[x][y].Type}`
+        showRow = `${showRow} ${this._Places[x][y]?.Type ?? ' '}`
       }
       console.log(`Row ${y} ${showRow}`)
     }
