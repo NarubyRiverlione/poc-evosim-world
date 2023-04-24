@@ -7,6 +7,8 @@ export default class World {
   SizeY: number
 
   constructor(sizeX: number, sizeY: number) {
+    if (sizeX <= 0) throw new Error('Invalid size for X when creating world')
+    if (sizeY <= 0) throw new Error('Invalid size for Y when creating world')
     this.SizeX = sizeX
     this.SizeY = sizeY
 
@@ -16,9 +18,9 @@ export default class World {
 
   initPlaces() {
     for (let y = 0; y < this.SizeY; y++) {
-      const emptyRow: WorldObject[] = []
+      const emptyRow: null[] = []
       for (let x = 0; x < this.SizeX; x++) {
-        emptyRow.push(new WorldObject())
+        emptyRow.push(null)
       }
       this._Places.push(emptyRow)
     }
@@ -30,13 +32,16 @@ export default class World {
     this._Places[y][x] = worldObject
   }
   RemoveObject(x: number, y: number) {
-    this._Places[y][x] = null // new WorldObject()
+    if (!this._Places[y][x]) return // nothing to be removed
+    this._Places[y][x] = null
   }
   RandomCoord() {
     const x = Math.floor(Math.random() * this.SizeX)
     const y = Math.floor(Math.random() * this.SizeY)
     return { x, y }
   }
+
+  // TODO is visualisatie --> apart bestand of project
   /* istanbul ignore next */
   ShowAll() {
     for (let y = 0; y < this.SizeY; y++) {
@@ -47,4 +52,20 @@ export default class World {
       console.log(`Row ${y} ${showRow}`)
     }
   }
+
+
+  Thick() {
+    // Thick all existing WorldObjects
+    for (let y = 0; y < this.SizeY; y++) {
+      for (let x = 0; x < this.SizeX; x++) {
+        const worldObject = this._Places[y][x]
+        if (!worldObject) continue
+
+        worldObject.Thick()
+        if (worldObject.Energy <= 0) { this.RemoveObject(x, y) }
+      }
+
+    }
+  }
+
 }

@@ -11,23 +11,27 @@ describe('Wandering', () => {
     expect(testWandering.DirectionY).toBeGreaterThanOrEqual(-1)
     expect(testWandering.DirectionY).toBeLessThanOrEqual(1)
 
-    expect(testWandering.Steps).toBeLessThanOrEqual(10)
+    expect(testWandering.StepsToMake).toBeLessThanOrEqual(10)
   })
 
   it('use wandering until step are done', () => {
-    const testWorldObject = new WorldObject()
-    testWorldObject.WorldX = 100
-    testWorldObject.WorldY = 100
+    const testWorldObject = new WorldObject({ WorldX: 100, WorldY: 100, Id: 12345, Energy: 100 }, 'TestType')
 
     const testWandering = new Wandering(3)
-    const { Steps, DirectionX, DirectionY } = testWandering
+    const wanderingStep = testWandering.StepsToMake
 
-    for (let steps = 1; steps < Steps; steps++) {
+    for (let thicks = 0; thicks < wanderingStep; thicks++) {
+      const { StepsToMake, DirectionX, DirectionY } = testWandering
       testWandering.NewLocation(testWorldObject)
-      expect(testWorldObject.WorldX).toBe(100 + DirectionX * steps)
-      expect(testWorldObject.WorldY).toBe(100 + DirectionY * steps)
-      expect(Steps).toBeGreaterThanOrEqual(0)
+      expect(testWorldObject.WorldX).toBe(100 + DirectionX * (thicks + 1))
+      expect(testWorldObject.WorldY).toBe(100 + DirectionY * (thicks + 1))
+      expect(StepsToMake).toBe(wanderingStep - 1 * thicks)
     }
+    expect(testWandering.StepsToMake).toBe(0)
+    // new wandering direction (cannot be tested because it't random)
+    testWandering.NewLocation(testWorldObject)
+    expect(testWandering.StepsToMake).not.toBe(0)
+
   })
 
 })

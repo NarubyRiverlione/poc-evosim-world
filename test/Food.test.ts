@@ -16,19 +16,22 @@ describe('Food', () => {
 
   it('Add food to Place in World', () => {
     const { x, y } = testWorld.RandomCoord()
-    const id = 12345
-    const testFood: Food = new Food(x, y, id, testEnergy)
+    const testFood: Food = new Food({ WorldX: x, WorldY: y, Id: 1234, Energy: testEnergy })
     testWorld.AddObject(x, y, testFood)
     expect(testWorld.GetPlace(x, y)).toEqual(testFood)
   })
   it('Eaten = removed for Place', () => {
     const { x, y } = testWorld.RandomCoord()
-    const id = 12345
-    const testFood: Food = new Food(x, y, id, testEnergy)
+    const testFood: Food = new Food({ WorldX: x, WorldY: y, Id: 1234, Energy: testEnergy })
     testWorld.AddObject(x, y, testFood)
     testFood.Eat()
+    expect(testFood.Energy).toBe(0)
 
+    testWorld.Thick()
     const testPlace = testWorld.GetPlace(x, y)
-    expect(testPlace.Exist).toBeFalsy()
+    expect(testPlace).toBeNull()
+
+    testFood.Thick()
+    expect(testFood.Exist).toBeFalsy()
   })
 })

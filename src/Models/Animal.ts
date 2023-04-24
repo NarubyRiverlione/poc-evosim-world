@@ -1,18 +1,15 @@
 import { CstWorld, CstWorldObjects } from '../Cst'
 import Wandering from './Wandering'
-import WorldObject from './WorldObject'
+import WorldObject, { WorldObjectStart } from './WorldObject'
 
 export default class Animal extends WorldObject {
   WanderingSteps: Wandering | null
 
-  constructor(x: number, y: number) {
-    super()
-    this.Type = CstWorldObjects.Animal
-    this.WorldX = x
-    this.WorldY = y
-    this.Energy = CstWorld.Animal.StartEnergy
+  constructor(startValues: WorldObjectStart) {
+    super(startValues, CstWorldObjects.Animal)
     this.WanderingSteps = null
   }
+
 
   StartWandering() {
     this.WanderingSteps = new Wandering(CstWorld.Animal.RandomSteps)

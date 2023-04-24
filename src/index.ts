@@ -8,7 +8,7 @@ const FoodItems: Food[] = []
 
 for (let id = 0; id < CstWorld.Food.StartAmount; id++) {
   const { x, y } = StartWorld.RandomCoord()
-  FoodItems[id] = new Food(x, y, id, CstWorld.Food.Energy)
+  FoodItems[id] = new Food({ WorldX: x, WorldY: y, Id: id, Energy: CstWorld.Food.Energy })
   StartWorld.AddObject(x, y, FoodItems[id])
 }
 
