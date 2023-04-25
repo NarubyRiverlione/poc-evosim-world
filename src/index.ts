@@ -1,4 +1,4 @@
-import { CstWorld } from './Cst'
+import { CstWorld, CstWorldObjects } from './Cst'
 import Animal from './Models/Animal'
 import Food from './Models/Food'
 import World from './Models/World'
@@ -6,8 +6,6 @@ import * as readline from 'readline'
 
 const StartWorld = new World(CstWorld.Size.X, CstWorld.Size.Y)
 
-
-// TODO is visualisatie --> apart bestand of project
 /* istanbul ignore next */
 function ShowAll(simThick: number, world: World) {
   readline.cursorTo(process.stdout, 0, 0)
@@ -19,15 +17,21 @@ function ShowAll(simThick: number, world: World) {
     for (let x = 0; x < world.SizeX; x++) {
       const place = world.GetPlace(x, y)
       if (!place) {
-        showRow = `${showRow} --`; continue
+        showRow = `${showRow} ----------`
+        continue
       }
 
       const { Type, Id } = place
       showRow = `${showRow} ${Type.substring(0, 1)}${Id}`
+
+      if (Type === CstWorldObjects.Animal) {
+        const { WanderingSteps: { DirectionX, DirectionY, StepsToMake } } = place as Animal
+        const movement = ` ${DirectionX}/${DirectionY}/${StepsToMake}`
+        showRow = `${showRow}${movement}`
+      }
     }
 
-    // TODO https://stackoverflow.com/questions/17309749/node-js-console-log-is-it-possible-to-update-a-line-rather-than-create-a-new-l
-    process.stdout.write(`Row ${y} ${showRow} \n`)
+    process.stdout.write(`${showRow} \n`)
   }
 }
 
@@ -54,6 +58,6 @@ setInterval(() => {
   simTicks += 1
   StartWorld.Thick()
   ShowAll(simTicks, StartWorld)
-}, 1500)
+}, 2000)
 
 

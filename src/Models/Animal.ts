@@ -3,7 +3,7 @@ import Wandering from './Wandering'
 import WorldObject, { WorldObjectStart } from './WorldObject'
 
 export default class Animal extends WorldObject {
-  WanderingSteps: Wandering | null
+  WanderingSteps: Wandering
 
   constructor(startValues: WorldObjectStart) {
     super(startValues, CstWorldObjects.Animal, true)
@@ -11,12 +11,8 @@ export default class Animal extends WorldObject {
   }
 
 
-  StopWandering() {
-    this.WanderingSteps = null
-  }
-
   Thick() {
-    this.WanderingSteps?.NewLocation(this)
+    this.WanderingSteps.NewLocation(this)
     super.Thick()
   }
 }

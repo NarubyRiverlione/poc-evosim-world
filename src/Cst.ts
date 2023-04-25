@@ -1,5 +1,5 @@
 export const CstWorld = {
-  Size: { X: 20, Y: 20 },
+  Size: { X: 5, Y: 30 },
   Food: { StartAmount: 5, Energy: 1 },
   Animal: { StartAmount: 2, StartEnergy: 10, RandomSteps: 3 },
 }

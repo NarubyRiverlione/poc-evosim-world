@@ -33,5 +33,13 @@ describe('Wandering', () => {
     expect(testWandering.StepsToMake).not.toBe(0)
 
   })
+  it('Stop wandering', () => {
+    const testWandering = new Wandering(3)
+    testWandering.Stop()
+    const { StepsToMake, DirectionX, DirectionY } = testWandering
+    expect(StepsToMake).toBe(-1)
+    expect(DirectionX).toBe(0)
+    expect(DirectionY).toBe(0)
+  })
 
 })

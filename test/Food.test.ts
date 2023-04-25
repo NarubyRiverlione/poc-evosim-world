@@ -1,3 +1,4 @@
+import exp from 'constants'
 import Food from '../src/Models/Food'
 import World from '../src/Models/World'
 
@@ -28,6 +29,7 @@ describe('Food', () => {
     expect(testFood.Energy).toBe(0)
 
     testWorld.Thick()
+    expect(testFood.Exist).toBeFalsy()
     const testPlace = testWorld.GetPlace(x, y)
     expect(testPlace).toBeNull()
 

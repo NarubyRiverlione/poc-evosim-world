@@ -1,13 +1,4 @@
-export interface IWorldObject {
-  Type: string,
-  WorldX: number,
-  WorldY: number
-  Id: number,
-  Name?: string,
-  Exist: boolean,
-  Energy: number,
-  IsWandering: boolean
-}
+import { IWorldObject } from '../Interfaces/IWorldObject'
 
 export type WorldObjectStart = {
   WorldX: number,
@@ -24,7 +15,7 @@ export default class WorldObject implements IWorldObject {
   Name?: string | undefined
   Exist: boolean
   Energy: number
-  IsWandering: boolean
+  IsMoveable: boolean
 
   constructor(startValues: WorldObjectStart, type: string, IsWandering = false) {
     this.Type = type
@@ -33,7 +24,7 @@ export default class WorldObject implements IWorldObject {
     this.WorldX = startValues.WorldX
     this.WorldY = startValues.WorldY
     this.Energy = startValues.Energy
-    this.IsWandering = IsWandering
+    this.IsMoveable = IsWandering
   }
 
   Thick() {
@@ -42,6 +33,7 @@ export default class WorldObject implements IWorldObject {
       this.Exist = false
       this.WorldX = -1
       this.WorldY = -1
+      this.IsMoveable = false
     }
   }
 }
