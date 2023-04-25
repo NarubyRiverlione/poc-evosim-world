@@ -13,6 +13,7 @@ export default class Animal extends WorldObject {
 
   Thick() {
     this.WanderingSteps.NewLocation(this)
+    this.Energy -= CstWorld.Animal.MoveEnergy
     super.Thick()
   }
 }

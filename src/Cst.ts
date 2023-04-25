@@ -1,7 +1,7 @@
 export const CstWorld = {
-  Size: { X: 5, Y: 30 },
+  Size: { X: 10, Y: 30 },
   Food: { StartAmount: 5, Energy: 1 },
-  Animal: { StartAmount: 2, StartEnergy: 10, RandomSteps: 3 },
+  Animal: { StartAmount: 2, StartEnergy: 20, RandomSteps: 3, MoveEnergy: 1 },
 }
 
 export const CstWorldObjects = {
