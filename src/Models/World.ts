@@ -77,17 +77,5 @@ export default class World {
     return { checkedX, checkedY }
   }
 
-  // TODO is visualisatie --> apart bestand of project
-  /* istanbul ignore next */
-  ShowAll(simThick: number) {
-    console.log(`+++ SIM STEP ${simThick} +++++`)
-    for (let y = 0; y < this.SizeY; y++) {
-      let showRow = ''
-      for (let x = 0; x < this.SizeX; x++) {
-        showRow = `${showRow} ${this._Places[x][y]?.Type ?? ' '}${this._Places[x][y]?.Id ?? ''}`
-      }
-      console.log(`Row ${y} ${showRow}`)
-    }
-    console.log('')
-  }
+
 }

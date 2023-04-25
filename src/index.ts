@@ -2,9 +2,34 @@ import { CstWorld } from './Cst'
 import Animal from './Models/Animal'
 import Food from './Models/Food'
 import World from './Models/World'
+import * as readline from 'readline'
 
 const StartWorld = new World(CstWorld.Size.X, CstWorld.Size.Y)
 
+
+// TODO is visualisatie --> apart bestand of project
+/* istanbul ignore next */
+function ShowAll(simThick: number, world: World) {
+  readline.cursorTo(process.stdout, 0, 0)
+  readline.clearScreenDown(process.stdout)
+
+  process.stdout.write(`+++ SIM STEP ${simThick} +++++\n`)
+  for (let y = 0; y < world.SizeY; y++) {
+    let showRow = ''
+    for (let x = 0; x < world.SizeX; x++) {
+      const place = world.GetPlace(x, y)
+      if (!place) {
+        showRow = `${showRow} --`; continue
+      }
+
+      const { Type, Id } = place
+      showRow = `${showRow} ${Type.substring(0, 1)}${Id}`
+    }
+
+    // TODO https://stackoverflow.com/questions/17309749/node-js-console-log-is-it-possible-to-update-a-line-rather-than-create-a-new-l
+    process.stdout.write(`Row ${y} ${showRow} \n`)
+  }
+}
 
 // ADD FOOD
 const foods: Food[] = []
@@ -22,8 +47,13 @@ for (let id = 0; id < CstWorld.Food.StartAmount; id++) {
   StartWorld.AddObject(x, y, animals[id])
 }
 
+
 // RUN SIMULATION
-for (let simTicks = 0; simTicks < 10; simTicks++) {
+let simTicks = 0
+setInterval(() => {
+  simTicks += 1
   StartWorld.Thick()
-  StartWorld.ShowAll(simTicks)
-}
+  ShowAll(simTicks, StartWorld)
+}, 1500)
+
+
