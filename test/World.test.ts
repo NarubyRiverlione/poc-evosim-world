@@ -1,4 +1,6 @@
+import { CstWorld } from '../src/Cst'
 import Animal from '../src/Models/Animal'
+import Food from '../src/Models/Food'
 import World from '../src/Models/World'
 import WorldObject from '../src/Models/WorldObject'
 
@@ -99,9 +101,9 @@ describe('World', () => {
     expect(orgPlace).toBeNull()
   })
   it('Collision detection : don\'t move into occupied place, stay in previous place', () => {
-    // place item at occupX & occuY
+    // place item at foodX & occuY
     const { x: occuX, y: occuY } = testWorld.RandomCoord()
-    const occupiedWorldObject = new WorldObject({ WorldX: occuX, WorldY: occuY, Id: 1234, Energy: 100 }, 'occupy')
+    const occupiedWorldObject = new WorldObject({ WorldX: occuX, WorldY: occuY, Id: 1234, Energy: 100 }, 'foodY')
     testWorld.AddObject(occuX, occuY, occupiedWorldObject)
     // place test item right to occuX
     const testWorldObject = new Animal({ WorldX: occuX + 1, WorldY: occuY, Id: 456, Energy: 100 })
@@ -113,5 +115,25 @@ describe('World', () => {
     testWorld.Thick()
 
     expect(testWorldObject.WorldX).toBe(occuX + 1)
+  })
+  it('Collision with food = eat food --> add energy, remove food', () => {
+    // food  at foodX & occuY
+    const { x: foodX, y: foodY } = testWorld.RandomCoord()
+    const testFood = new Food({ WorldX: foodX, WorldY: foodY, Id: 1234, Energy: CstWorld.Food.Energy })
+    testWorld.AddObject(foodX, foodY, testFood)
+    // place test item right to food
+    const testWorldObject = new Animal({
+      WorldX: foodX + 1, WorldY: foodY, Id: 456,
+      Energy: CstWorld.Animal.StartEnergy,
+    })
+    testWorld.AddObject(foodX + 1, foodY, testWorldObject)
+    testWorldObject.WanderingSteps.DirectionX = -1
+    testWorldObject.WanderingSteps.DirectionY = 0
+    testWorldObject.WanderingSteps.StepsToMake = 2
+    // try move test item to left, into occupied place --> should stay in previous place
+    testWorld.Thick()
+    const expectEnergy = CstWorld.Animal.StartEnergy - CstWorld.Animal.MoveEnergy + CstWorld.Food.Energy
+    expect(testWorld.GetPlace(foodX, foodY)).toBeNull()
+    expect(testWorldObject.Energy).toBe(expectEnergy)
   })
 })

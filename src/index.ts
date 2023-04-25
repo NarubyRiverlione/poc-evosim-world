@@ -16,7 +16,7 @@ for (let id = 0; id < CstWorld.Food.StartAmount; id++) {
 
 // ADD ANIMALS
 const animals: Animal[] = []
-for (let id = 0; id < CstWorld.Food.StartAmount; id++) {
+for (let id = 0; id < CstWorld.Animal.StartAmount; id++) {
   const { x, y } = StartWorld.RandomCoord()
   animals[id] = new Animal({ WorldX: x, WorldY: y, Energy: CstWorld.Animal.StartEnergy, Id: id })
   StartWorld.AddObject(x, y, animals[id])

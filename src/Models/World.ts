@@ -1,3 +1,6 @@
+import { CstWorld, CstWorldObjects } from '../Cst'
+import Animal from './Animal'
+import Food from './Food'
 import WorldObject from './WorldObject'
 
 
@@ -61,9 +64,20 @@ export default class World {
           worldObject.WorldX = checkedX; worldObject.WorldY = checkedY
 
           // Collision detection : don't move into occupied place, stay in previous place
-          if (this._Places[checkedY][checkedX]) {
+          const occupied = this._Places[checkedY][checkedX]
+          if (occupied) {
             worldObject.WorldX = orgX
             worldObject.WorldY = orgY
+            // collision with Food --> eat food (add energy, remove food)
+            if (occupied.Type === CstWorldObjects.Food) {
+              const food = occupied as Food
+              const animal = worldObject as Animal
+              animal.Eat(food.Energy)
+              food.Eaten()
+              // remove food immediately, not in next thick
+              this._Places[checkedY][checkedX] = null
+              // TODO add new food ?
+            }
           }
           //  remove previous location, add new location
           if (orgX != worldObject.WorldX || orgY != worldObject.WorldY) {

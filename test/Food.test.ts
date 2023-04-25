@@ -25,7 +25,7 @@ describe('Food', () => {
     const { x, y } = testWorld.RandomCoord()
     const testFood: Food = new Food({ WorldX: x, WorldY: y, Id: 1234, Energy: testEnergy })
     testWorld.AddObject(x, y, testFood)
-    testFood.Eat()
+    testFood.Eaten()
     expect(testFood.Energy).toBe(0)
 
     testWorld.Thick()

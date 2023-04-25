@@ -1,6 +1,5 @@
 /* istanbul file */
 import { CstWorldObjects } from './Cst'
-import Animal from './Models/Animal'
 import World from './Models/World'
 import * as readline from 'readline'
 
@@ -13,7 +12,7 @@ export function ShowAll(simThick: number, world: World) {
     let showRow = ''
     for (let x = 0; x < world.SizeX; x++) {
       const place = world.GetPlace(x, y)
-      if (!place) {
+      if (!place || !place.Exist) {
         showRow = `${showRow} ------`
         continue
       }

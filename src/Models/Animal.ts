@@ -16,4 +16,8 @@ export default class Animal extends WorldObject {
     this.Energy -= CstWorld.Animal.MoveEnergy
     super.Thick()
   }
+
+  Eat(addEnergy: number) {
+    this.Energy += addEnergy
+  }
 }

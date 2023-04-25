@@ -8,7 +8,7 @@ export default class Food extends WorldObject {
 
   }
 
-  Eat() {
+  Eaten() {
     this.Energy = 0
   }
 
