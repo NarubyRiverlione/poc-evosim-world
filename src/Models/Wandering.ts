@@ -1,5 +1,5 @@
 import { IMovement } from '../Interfaces/IMovement'
-import WorldObject from './WorldObject'
+import { IWorldObject } from '../Interfaces/IWorldObject'
 
 function randomDirection() { return Math.random() > 0.5 ? 1 : -1 }
 
@@ -17,9 +17,7 @@ export default class Wandering implements IMovement {
     this.Start()
   }
 
-
-
-  private Start() {
+  Start() {
     this.DirectionX = randomDirection()
     this.DirectionY = randomDirection()
     this.StepsToMake = Math.floor(Math.random() * this.MaxSteps) + 1
@@ -31,7 +29,7 @@ export default class Wandering implements IMovement {
     this.StepsToMake = -1
   }
 
-  NewLocation(worldObject: WorldObject) {
+  NewLocation(worldObject: IWorldObject) {
     // StepsToMake done, new direction
     if (this.StepsToMake === 0) {
       this.Start()

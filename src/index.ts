@@ -5,6 +5,7 @@ import World from './Models/World'
 import { ShowAll } from './ShowAll'
 
 const StartWorld = new World(CstWorld.Size.X, CstWorld.Size.Y)
+StartWorld.SeedTerrain()
 
 // ADD FOOD
 const foods: Food[] = []

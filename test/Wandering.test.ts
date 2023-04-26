@@ -2,7 +2,6 @@ import Wandering from '../src/Models/Wandering'
 import WorldObject from '../src/Models/WorldObject'
 
 describe('Wandering', () => {
-
   it('new direction & steps', () => {
     const testWandering = new Wandering(10)
 
@@ -15,7 +14,7 @@ describe('Wandering', () => {
   })
 
   it('use wandering until step are done', () => {
-    const testWorldObject = new WorldObject({ WorldX: 100, WorldY: 100, Id: 12345, Energy: 100 }, 'TestType')
+    const testWorldObject = new WorldObject({ WorldX: 100, WorldY: 100, Id: 12345 }, 'TestType')
 
     const testWandering = new Wandering(3)
     const wanderingStep = testWandering.StepsToMake

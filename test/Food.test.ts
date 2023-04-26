@@ -1,4 +1,3 @@
-import exp from 'constants'
 import Food from '../src/Models/Food'
 import World from '../src/Models/World'
 
