@@ -34,7 +34,7 @@ export default class Movement implements IMovement {
   }
 
   NewLocation(worldObject: IWorldObject) {
-    // is wandering and StepsToMake done, new wandering direction
+    // is wandering and StepsToMake done,
     if (this.IsWandering && this.WanderingStepsToMake === 0) {
       this.StartWandering()
     }
@@ -47,8 +47,7 @@ export default class Movement implements IMovement {
   DirectionToGoal(currentX: number, currentY: number, goalX: number, goalY: number) {
     // move to goal = no wandering
     this.IsWandering = false
-    // at goal : stop movement
-    // TODO can goal ever be reached with collision detection ?
+    // around goal (prevent collision): stop movement
     if (currentX === goalX && currentY === goalY) {
       this.Stop()
       // TODO restart wandering now goal is reached ?
@@ -56,8 +55,8 @@ export default class Movement implements IMovement {
       return
     }
 
-    this.DirectionX = goalX > currentX ? +1 : -1
-    this.DirectionY = goalY > currentY ? +1 : -1
+    this.DirectionX = goalX === currentX ? 0 : goalX > currentX ? +1 : -1
+    this.DirectionY = goalY === currentY ? 0 : goalY > currentY ? +1 : -1
 
   }
 }

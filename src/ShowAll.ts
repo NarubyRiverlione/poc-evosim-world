@@ -37,8 +37,8 @@ export function ShowAll(simThick: number, world: World) {
     process.stdout.write(`${showRow} \n`)
   }
 
-  process.stdout.write('')
-  for (let y = 0; y < world.SizeY; y++) {
-    process.stdout.write(`${world._Grid[y]} \n`)
-  }
+  // process.stdout.write('')
+  // for (let y = 0; y < world.SizeY; y++) {
+  //   process.stdout.write(`${world._Grid[y]} \n`)
+  // }
 }

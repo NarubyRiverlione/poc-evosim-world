@@ -84,7 +84,6 @@ describe('World init', () => {
 })
 
 // describe('World seed terrain', () => {
-
 // })
 
 describe('World add/remove objects', () => {

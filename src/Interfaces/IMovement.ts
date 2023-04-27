@@ -5,6 +5,8 @@ export interface IMovement {
   DirectionY: number;
   WanderingStepsToMake: number;
 
+
+  Stop: () => void
   NewLocation: (worldObject: IWorldObject) => void
   DirectionToGoal: (currentX: number, currentY: number, goalX: number, goalY: number) => void
 }

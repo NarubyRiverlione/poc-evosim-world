@@ -1,11 +1,12 @@
 import { CstWorld, CstWorldObjects, CstWorldTerrain } from '../Cst'
+import { IWorldObject } from '../Interfaces/IWorldObject'
 import Animal from './Animal'
 import Food from './Food'
 import WorldObject from './WorldObject'
 
 
 export default class World {
-  _Grid: string[]                    // grid of passable terrain
+  private _Grid: string[]                    // grid of passable terrain
   private _Places: (WorldObject | null)[][]  // potential content of a terrain
   private _Items: WorldObject[]              // all world objects ever in existence in the world
   SizeX: number
@@ -23,24 +24,33 @@ export default class World {
 
     this._Places = []
     this.initWorld()
-    // this.seedTerrain()
   }
 
-  // create empty terrain and places
+  // create empty places
   private initWorld() {
     for (let y = 0; y < this.SizeY; y++) {
-      // let emptyTerrainRow = ''
       const emptyPlaceRow: null[] = []
       for (let x = 0; x < this.SizeX; x++) {
-        // emptyTerrainRow = emptyTerrainRow + CstWorldTerrain.Empty + ','
         emptyPlaceRow.push(null)
       }
-      // emptyTerrainRow = emptyTerrainRow.substring(0, emptyTerrainRow.length - 1) // remove last ','
-      // this._Grid.push(emptyTerrainRow)
       this._Places.push(emptyPlaceRow)
     }
   }
+  // create movable grid for pathfinding
+  private _createGrid() {
+    this._Grid = []
+    for (let y = 0; y < this.SizeY; y++) {
+      let terrainRow = ''
+      for (let x = 0; x < this.SizeX; x++) {
+        const isOccupied = this._Places[y][x]?.Exist ? '1' : '0'
+        terrainRow = `${terrainRow}${isOccupied},`
+      }
+      terrainRow = terrainRow.substring(0, terrainRow.length - 1) // remove last ','
+      this._Grid.push(terrainRow)
+    }
 
+  }
+  // add terrain types as world objects
   SeedTerrain() {
     for (let addWater = 0; addWater < CstWorld.Size.AmountWater; addWater++) {
       const { x, y } = this.RandomCoord()
@@ -54,29 +64,6 @@ export default class World {
     }
   }
 
-  // add a terrain type
-  // TODO  expand seed in random direction and size
-  // AddTerrain(x: number, y: number, terrainType: string) {
-  //   const terrainRow = this._Grid[y]
-  //   const terrainCols = terrainRow.split(',')
-  //   terrainCols[x] = terrainType
-
-  //   let updatedRow = ''
-  //   terrainCols.forEach(col => updatedRow = updatedRow + col + ',')
-  //   updatedRow = updatedRow.substring(0, updatedRow.length - 1) // remove last ','
-  //   this._Grid[y] = updatedRow
-  // }
-
-  // GetTerrain(x: number, y: number) {
-  //   try {
-  //     const row = this._Grid[y]
-  //     const tile = row.split(',')[x]
-  //     return tile
-  //   } catch (ex) {
-  //     const fout = ex as Error
-  //     throw new Error(`Error GetTerrain (${x}/${y}), World size:${this.SizeX / this.SizeY}. \n ${fout.message} `)
-  //   }
-  // }
   GetPlace(x: number, y: number) {
     try {
       return this._Places[y][x]
@@ -100,20 +87,17 @@ export default class World {
     const y = Math.floor(Math.random() * this.SizeY)
     return { x, y }
   }
+  Guard(x: number, y: number) {
+    let checkedX = x
+    let checkedY = y
+    if (x < 0) checkedX = 0
+    if (y < 0) checkedY = 0
+    if (x > this.SizeX - 1) checkedX = this.SizeX - 1
+    if (y > this.SizeY - 1) checkedY = this.SizeY - 1
 
-  private _createGrid() {
-    this._Grid = []
-    for (let y = 0; y < this.SizeY; y++) {
-      let terrainRow = ''
-      for (let x = 0; x < this.SizeX; x++) {
-        const isOccupied = this._Places[y][x]?.Exist ? '1' : '0'
-        terrainRow = `${terrainRow}${isOccupied},`
-      }
-      terrainRow = terrainRow.substring(0, terrainRow.length - 1) // remove last ','
-      this._Grid.push(terrainRow)
-    }
-
+    return { checkedX, checkedY }
   }
+
   Thick() {
     this._createGrid()
     // Thick all existing WorldObjects
@@ -126,26 +110,18 @@ export default class World {
 
         // check & execute movement
         if (worldObject.IsMoveable) {
+          // TODO generic type of moveable object instead of animal ?
+          const animal = worldObject as Animal
           // don't move of the world
           const { checkedX, checkedY } = this.Guard(worldObject.WorldX, worldObject.WorldY)
           worldObject.WorldX = checkedX; worldObject.WorldY = checkedY
 
-          // Collision detection : don't move into occupied place, stay in previous place
+          // Collision detected 
+          // ==> don't move into occupied place, stay in previous place & stop movement
+          // ==> check if collision is with Food --> eat food
           const occupied = this._Places[checkedY][checkedX]
-          if (occupied) {
-            worldObject.WorldX = orgX
-            worldObject.WorldY = orgY
-            // collision with Food --> eat food (add energy, remove food)
-            if (occupied.Type === CstWorldObjects.Food) {
-              const food = occupied as Food
-              const animal = worldObject as Animal
-              animal.Eat(food.Energy)
-              food.Eaten()
-              // remove food immediately, not in next thick
-              this._Places[checkedY][checkedX] = null
-              // TODO add new food ?
-            }
-          }
+          if (occupied) { this.collisionDetected(occupied, animal, orgX, orgY) }
+
           //  remove previous location, add new location
           if (orgX != worldObject.WorldX || orgY != worldObject.WorldY) {
             this._Places[orgY][orgX] = null
@@ -158,14 +134,29 @@ export default class World {
     })
   }
 
-  Guard(x: number, y: number) {
-    let checkedX = x
-    let checkedY = y
-    if (x < 0) checkedX = 0
-    if (y < 0) checkedY = 0
-    if (x > this.SizeX - 1) checkedX = this.SizeX - 1
-    if (y > this.SizeY - 1) checkedY = this.SizeY - 1
+  private collisionDetected(occupied: IWorldObject, animal: Animal, orgX: number, orgY: number) {
+    // cancel move
+    animal.WorldX = orgX
+    animal.WorldY = orgY
+    animal.Movement.Stop()
 
-    return { checkedX, checkedY }
+    // collision with Food --> eat food (add energy, remove this food, add new food)
+    if (occupied.Type === CstWorldObjects.Food) {
+      const food = occupied as Food
+      animal.Eat(food.Energy)
+      food.Eaten()
+      // remove food immediately, not in next thick
+      this._Places[occupied.WorldY][occupied.WorldX] = null
+      //  add new food 
+      const { x, y } = this.RandomCoord()
+      const newFood = new Food({
+        WorldX: x, WorldY: y, Id: this._Items.length,
+        Energy: CstWorld.Food.Energy,
+      })
+      this.AddObject(x, y, newFood)
+    }
   }
+
+
+
 }
