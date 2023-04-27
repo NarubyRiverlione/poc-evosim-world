@@ -21,6 +21,9 @@ for (let id = 0; id < CstWorld.Animal.StartAmount; id++) {
   const { x, y } = StartWorld.RandomCoord()
   animals[id] = new Animal({ WorldX: x, WorldY: y, Energy: CstWorld.Animal.StartEnergy, Id: id })
   StartWorld.AddObject(x, y, animals[id])
+
+  // animals[id].MoveToGoal(CstWorld.Size.X, CstWorld.Size.Y)
+  //  animals[id].MoveToGoal(0, 0)
 }
 
 

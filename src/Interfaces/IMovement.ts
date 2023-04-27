@@ -3,7 +3,8 @@ import { IWorldObject } from './IWorldObject'
 export interface IMovement {
   DirectionX: number;
   DirectionY: number;
-  StepsToMake: number;
+  WanderingStepsToMake: number;
 
   NewLocation: (worldObject: IWorldObject) => void
+  DirectionToGoal: (currentX: number, currentY: number, goalX: number, goalY: number) => void
 }

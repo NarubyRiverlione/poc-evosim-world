@@ -1,6 +1,6 @@
 import { CstWorld, CstWorldObjects } from '../Cst'
 import { IMovement } from '../Interfaces/IMovement'
-import Wandering from './Wandering'
+import Movement from './Movement'
 import WorldObject, { WorldObjectStart } from './WorldObject'
 
 export default class Animal extends WorldObject {
@@ -9,7 +9,7 @@ export default class Animal extends WorldObject {
   constructor(startValues: WorldObjectStart) {
     super(startValues, CstWorldObjects.Animal, true)
     // default behavior is start wandering
-    this.Movement = new Wandering(CstWorld.Animal.RandomSteps)
+    this.Movement = new Movement(CstWorld.Animal.RandomSteps)
   }
 
 
@@ -21,5 +21,9 @@ export default class Animal extends WorldObject {
 
   Eat(addEnergy: number) {
     this.Energy += addEnergy
+  }
+
+  MoveToGoal(x: number, y: number) {
+    this.Movement.DirectionToGoal(this.WorldX, this.WorldY, x, y)
   }
 }

@@ -134,7 +134,7 @@ describe('World movements', () => {
     testWorld.AddObject(occupyX + 1, occupyY, testWorldObject)
     testWorldObject.Movement.DirectionX = -1
     testWorldObject.Movement.DirectionY = 0
-    testWorldObject.Movement.StepsToMake = 2
+    testWorldObject.Movement.WanderingStepsToMake = 2
     // try move test item to left, into occupied place --> should stay in previous place
     testWorld.Thick()
 
@@ -153,7 +153,7 @@ describe('World movements', () => {
     testWorld.AddObject(foodX + 1, foodY, testWorldObject)
     testWorldObject.Movement.DirectionX = -1
     testWorldObject.Movement.DirectionY = 0
-    testWorldObject.Movement.StepsToMake = 2
+    testWorldObject.Movement.WanderingStepsToMake = 2
     // try move test item to left, into occupied place --> should stay in previous place
     testWorld.Thick()
     const expectEnergy = CstWorld.Animal.StartEnergy - CstWorld.Animal.MoveEnergy + CstWorld.Food.Energy
