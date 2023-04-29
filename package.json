@@ -1,5 +1,5 @@
 {
-  "name": "poc-evosim-startworld",
+  "name": "poc-evosim-world",
   "version": "0.0.1",
   "description": "EvoSim Starter World",
   "main": "dist/src/index.js",

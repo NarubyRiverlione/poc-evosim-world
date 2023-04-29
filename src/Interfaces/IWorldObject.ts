@@ -1,9 +1,10 @@
+import { WorldObjectTypes } from '../Models/WorldObject'
+
 export interface IWorldObject {
-  Type: string;
+  Type: WorldObjectTypes;
   WorldX: number;
   WorldY: number;
   Id: string;
-  Name?: string;
   Exist: boolean;
   IsMoveable: boolean;
 }

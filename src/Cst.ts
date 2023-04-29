@@ -1,13 +1,29 @@
+import { WorldObjectTypes } from './Models/WorldObject'
+
 export const CstWorld = {
-  Size: { X: 10, Y: 10, AmountWater: 5, AmountMountains: 5 },
-  Food: { StartAmount: 30, Energy: 10 },
-  Animal: { StartAmount: 2, StartEnergy: 20, RandomSteps: 3, MoveEnergy: 1 },
+  Size: { X: 20, Y: 30 },
+  StartAmount: {
+    [WorldObjectTypes.Food]: 10,
+    [WorldObjectTypes.Animal]: 1,
+    [WorldObjectTypes.Water]: 0,
+    [WorldObjectTypes.Mountain]: 0,
+    [WorldObjectTypes.Test]: 0,
+  },
+  StartEnergy: {
+    [WorldObjectTypes.Food]: 10,
+    [WorldObjectTypes.Animal]: 20,
+    [WorldObjectTypes.Water]: 0,
+    [WorldObjectTypes.Mountain]: 0,
+    [WorldObjectTypes.Test]: 100,
+  },
+
+  Animal: {
+    RandomSteps: 3,
+    MoveEnergy: 1, SeeRange: 4,
+  },
 }
 
-export const CstWorldObjects = {
-  Food: 'Food',
-  Animal: 'Animal',
-}
+
 export const CstWorldTerrain = {
   Empty: '0',
   Water: '1',

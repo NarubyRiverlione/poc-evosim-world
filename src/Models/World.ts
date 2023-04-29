@@ -1,9 +1,15 @@
-import { CstWorld, CstWorldObjects, CstWorldTerrain } from '../Cst'
+import { CstWorld } from '../Cst'
 import { IWorldObject } from '../Interfaces/IWorldObject'
 import Animal from './Animal'
 import Food from './Food'
-import WorldObject from './WorldObject'
+import WorldObject, { WorldObjectTypes } from './WorldObject'
 
+
+export function RandomCoord(maxX: number, maxY: number) {
+  const x = Math.floor(Math.random() * maxX)
+  const y = Math.floor(Math.random() * maxY)
+  return { x, y }
+}
 
 export default class World {
   private _Grid: string[]                    // grid of passable terrain
@@ -50,18 +56,34 @@ export default class World {
     }
 
   }
-  // add terrain types as world objects
-  SeedTerrain() {
-    for (let addWater = 0; addWater < CstWorld.Size.AmountWater; addWater++) {
-      const { x, y } = this.RandomCoord()
-      const water = new WorldObject({ WorldX: x, WorldY: y, Id: addWater }, CstWorldTerrain.Water)
-      this.AddObject(x, y, water)
+
+  private _addStartObjects(objectType: WorldObjectTypes) {
+    const amount: number = CstWorld.StartAmount[objectType]
+    for (let id = 0; id < amount; id++) {
+      const { x, y } = RandomCoord(CstWorld.Size.X, CstWorld.Size.Y)
+      // TODO: check is place is empty before adding above it
+      let newWorldObject: WorldObject | null = null
+
+      switch (objectType) {
+        case WorldObjectTypes.Food:
+          newWorldObject = new Food({ WorldX: x, WorldY: y, Id: id }); break
+
+        case WorldObjectTypes.Animal:
+          newWorldObject = new Animal({ WorldX: x, WorldY: y, Id: id }); break
+
+        case WorldObjectTypes.Water, WorldObjectTypes.Mountain:
+          newWorldObject = new WorldObject({ WorldX: x, WorldY: y, Id: id }, objectType); break
+      }
+      if (!newWorldObject) throw new Error('Could\'t create world object of type ' + objectType)
+      this.AddObject(newWorldObject)
     }
-    for (let addMountain = 0; addMountain < CstWorld.Size.AmountMountains; addMountain++) {
-      const { x, y } = this.RandomCoord()
-      const mountain = new WorldObject({ WorldX: x, WorldY: y, Id: addMountain }, CstWorldTerrain.Mountain)
-      this.AddObject(x, y, mountain)
-    }
+  }
+
+  Seed() {
+    this._addStartObjects(WorldObjectTypes.Mountain)
+    this._addStartObjects(WorldObjectTypes.Water)
+    this._addStartObjects(WorldObjectTypes.Food)
+    this._addStartObjects(WorldObjectTypes.Animal)
   }
 
   GetPlace(x: number, y: number) {
@@ -73,8 +95,8 @@ export default class World {
     }
   }
 
-  AddObject(x: number, y: number, worldObject: WorldObject) {
-    this._Places[y][x] = worldObject
+  AddObject(worldObject: WorldObject) {
+    this._Places[worldObject.WorldY][worldObject.WorldX] = worldObject
     this._Items.push(worldObject)
   }
   RemoveObject(x: number, y: number) {
@@ -82,11 +104,7 @@ export default class World {
     // keep not-existing world object in items array for history analyse
   }
 
-  RandomCoord() {
-    const x = Math.floor(Math.random() * this.SizeX)
-    const y = Math.floor(Math.random() * this.SizeY)
-    return { x, y }
-  }
+
   Guard(x: number, y: number) {
     let checkedX = x
     let checkedY = y
@@ -105,13 +123,14 @@ export default class World {
       // doesn't exist any more --> no need for thick
       if (worldObject.Exist) {
         const { WorldX: orgX, WorldY: orgY } = worldObject
-
         worldObject.Thick()
 
         // check & execute movement
         if (worldObject.IsMoveable) {
           // TODO generic type of moveable object instead of animal ?
           const animal = worldObject as Animal
+
+
           // don't move of the world
           const { checkedX, checkedY } = this.Guard(worldObject.WorldX, worldObject.WorldY)
           worldObject.WorldX = checkedX; worldObject.WorldY = checkedY
@@ -127,11 +146,24 @@ export default class World {
             this._Places[orgY][orgX] = null
             this._Places[worldObject.WorldY][worldObject.WorldX] = worldObject
           }
+
+          // find closed food --> update direction for next Thick
+          this.FindFood(animal)
+          animal.DirectionToTarget()
         }
-        // remove World object without energy
-        if (worldObject.Energy <= 0) { this._Places[orgY][orgX] = null }
+        // // remove World object without energy
+        if (worldObject.Energy !== undefined && worldObject.Energy <= 0) { this._Places[orgY][orgX] = null }
       }
     })
+  }
+
+  FindFood(animal: Animal) {
+    const foods = this._Items.filter(item => item.Exist && item.Type === WorldObjectTypes.Food)
+    animal.ClosestTarget(foods)
+  }
+  GetAllAnimals() {
+    const animals = this._Items.filter(item => item.Exist && item.Type === WorldObjectTypes.Animal)
+    return animals as Animal[]
   }
 
   private collisionDetected(occupied: IWorldObject, animal: Animal, orgX: number, orgY: number) {
@@ -141,22 +173,16 @@ export default class World {
     animal.Movement.Stop()
 
     // collision with Food --> eat food (add energy, remove this food, add new food)
-    if (occupied.Type === CstWorldObjects.Food) {
+    if (occupied.Type === WorldObjectTypes.Food) {
       const food = occupied as Food
       animal.Eat(food.Energy)
       food.Eaten()
       // remove food immediately, not in next thick
       this._Places[occupied.WorldY][occupied.WorldX] = null
       //  add new food 
-      const { x, y } = this.RandomCoord()
-      const newFood = new Food({
-        WorldX: x, WorldY: y, Id: this._Items.length,
-        Energy: CstWorld.Food.Energy,
-      })
-      this.AddObject(x, y, newFood)
+      const { x, y } = RandomCoord(this.SizeX, this.SizeY)
+      const newFood = new Food({ WorldX: x, WorldY: y, Id: this._Items.length })
+      this.AddObject(newFood)
     }
   }
-
-
-
 }

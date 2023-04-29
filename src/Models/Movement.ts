@@ -3,6 +3,18 @@ import { IWorldObject } from '../Interfaces/IWorldObject'
 
 function randomDirection() { return Math.random() > 0.5 ? 1 : -1 }
 
+function directionTo(goal: number, current: number) {
+  return goal === current ? 0 : goal > current ? +1 : -1
+}
+
+
+export function distanceTo(currentX: number, currentY: number, goalX: number, goalY: number) {
+  const distX = Math.abs(goalX - currentX)
+  const distY = Math.abs(goalY - currentY)
+  const distance = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2))
+  return distance
+}
+
 export default class Movement implements IMovement {
   DirectionX: number
   DirectionY: number
@@ -15,8 +27,8 @@ export default class Movement implements IMovement {
     this.DirectionY = 0
     this.WanderingStepsToMake = 0
     this.WanderingMaxSteps = wanderingMaxSteps
-    this.IsWandering = true
-    this.StartWandering()
+    this.IsWandering = false
+    // this.StartWandering()
   }
 
   StartWandering() {
@@ -30,7 +42,7 @@ export default class Movement implements IMovement {
     this.IsWandering = false
     this.DirectionX = 0
     this.DirectionY = 0
-    this.WanderingStepsToMake = -1
+    this.WanderingStepsToMake = 0
   }
 
   NewLocation(worldObject: IWorldObject) {
@@ -41,13 +53,12 @@ export default class Movement implements IMovement {
 
     worldObject.WorldX += this.DirectionX
     worldObject.WorldY += this.DirectionY
-    this.WanderingStepsToMake -= 1
+    if (this.IsWandering) this.WanderingStepsToMake -= 1
   }
 
   DirectionToGoal(currentX: number, currentY: number, goalX: number, goalY: number) {
-    // move to goal = no wandering
-    this.IsWandering = false
-    // around goal (prevent collision): stop movement
+
+    //  collision preventing is done in World thick
     if (currentX === goalX && currentY === goalY) {
       this.Stop()
       // TODO restart wandering now goal is reached ?
@@ -55,8 +66,8 @@ export default class Movement implements IMovement {
       return
     }
 
-    this.DirectionX = goalX === currentX ? 0 : goalX > currentX ? +1 : -1
-    this.DirectionY = goalY === currentY ? 0 : goalY > currentY ? +1 : -1
+    this.DirectionX = directionTo(goalX, currentX)
+    this.DirectionY = directionTo(goalY, currentY)
 
   }
 }

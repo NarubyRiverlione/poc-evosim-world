@@ -4,7 +4,7 @@ export interface IMovement {
   DirectionX: number;
   DirectionY: number;
   WanderingStepsToMake: number;
-
+  IsWandering: boolean
 
   Stop: () => void
   NewLocation: (worldObject: IWorldObject) => void

@@ -1,7 +1,19 @@
 /* istanbul file */
-import { CstWorldObjects, CstWorldTerrain } from './Cst'
+import Animal from './Models/Animal'
 import World from './Models/World'
 import * as readline from 'readline'
+import { WorldObjectTypes } from './Models/WorldObject'
+
+function showAnimal(animal: Animal) {
+  const { Id, Energy, Target, Movement, Distance, WorldX, WorldY } = animal
+
+  let showRow = `${Id} X${WorldX}Y${WorldY} E${Energy}`
+  // showRow += `--> ${Movement?.DirectionX}/${Movement?.DirectionY} ${Distance} `
+
+  if (Movement.IsWandering) showRow += ` W${Movement.WanderingStepsToMake}`
+  if (Target) showRow += ` ${Target.Id}D${Distance}`
+  process.stdout.write(`${showRow} \n \n`)
+}
 
 export function ShowAll(simThick: number, world: World) {
   readline.cursorTo(process.stdout, 0, 0)
@@ -17,28 +29,36 @@ export function ShowAll(simThick: number, world: World) {
 
       const { Type, Id } = place
       switch (Type) {
-        case CstWorldTerrain.Water:
-          showRow = `${showRow} WWWWWW`; continue
-        case CstWorldTerrain.Mountain:
-          showRow = `${showRow} MMMMMM`; continue
-        case CstWorldObjects.Food:
-          showRow = `${showRow} --${Id}--`; continue
+        case WorldObjectTypes.Water:
+          showRow = `${showRow} WWWWW`; continue
+        case WorldObjectTypes.Mountain:
+          showRow = `${showRow} MMMMM`; continue
+        case WorldObjectTypes.Food:
+          showRow = `${showRow} *${Id}*`; continue
         default:
-          showRow = `${showRow} ${Id}`
+          showRow = `${showRow} ${Id} `
       }
 
-      if (Type === CstWorldObjects.Animal) {
-        // const { WanderingSteps: { DirectionX, DirectionY, StepsToMake } } = place as Animal
-        // const movement = ` ${DirectionX}/${DirectionY}/${StepsToMake}
-        showRow = `${showRow}/${place.Energy}`
-      }
+      // if (Type === CstWorldObjects.Animal) {
+      //   const animal = place as Animal
+      //   const { Movement, Distance, Target } = animal
+      //   if (Movement.IsWandering) showRow += `W${Movement.WanderingStepsToMake}`
+      //   if (Target) showRow += `${Target.Id}D${Distance}`
+      // }
     }
 
     process.stdout.write(`${showRow} \n`)
   }
 
-  // process.stdout.write('')
-  // for (let y = 0; y < world.SizeY; y++) {
-  //   process.stdout.write(`${world._Grid[y]} \n`)
-  // }
+  process.stdout.write('\n\n')
 }
+
+export function ShownAnimals(world: World) {
+  const animals = world.GetAllAnimals()
+  animals.forEach(animal => {
+    showAnimal(animal)
+  })
+
+}
+
+

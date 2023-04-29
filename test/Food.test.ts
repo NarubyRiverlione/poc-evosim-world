@@ -1,38 +1,33 @@
+import { CstWorld } from '../src/Cst'
 import Food from '../src/Models/Food'
-import World from '../src/Models/World'
+import { RandomCoord } from '../src/Models/World'
+import { WorldObjectTypes } from '../src/Models/WorldObject'
 
-let testSizeX: number
-let testSizeY: number
 let testEnergy: number
-let testWorld: World
-
+let randomX: number
+let randomY: number
 describe('Food', () => {
   beforeEach(() => {
-    testSizeX = Math.floor(Math.random() * 100)
-    testSizeY = Math.floor(Math.random() * 100)
     testEnergy = Math.floor(Math.random() * 100)
-    testWorld = new World(testSizeX, testSizeY)
+    const { x, y } = RandomCoord(100, 100)
+    randomX = x; randomY = y
   })
 
-  it('Add food to Place in World', () => {
-    const { x, y } = testWorld.RandomCoord()
-    const testFood: Food = new Food({ WorldX: x, WorldY: y, Id: 1234, Energy: testEnergy })
-    testWorld.AddObject(x, y, testFood)
-    expect(testWorld.GetPlace(x, y)).toEqual(testFood)
+  it('Food with generic energy', () => {
+    const testFood: Food = new Food({ WorldX: randomX, WorldY: randomY, Id: 1234 })
+    const energy = CstWorld.StartEnergy[WorldObjectTypes.Food]
+    expect(testFood.Energy).toBe(energy)
   })
-  it('Eaten = removed for Place', () => {
-    const { x, y } = testWorld.RandomCoord()
-    const testFood: Food = new Food({ WorldX: x, WorldY: y, Id: 1234, Energy: testEnergy })
-    testWorld.AddObject(x, y, testFood)
+  it('Food with specific energy', () => {
+    const testFood: Food = new Food({ WorldX: randomX, WorldY: randomY, Id: 1234, Energy: testEnergy })
+    expect(testFood.Energy).toBe(testEnergy)
+  })
+
+
+  it('Eaten --> energy = 0', () => {
+    const testFood: Food = new Food({ WorldX: randomX, WorldY: randomY, Id: 1234 })
+
     testFood.Eaten()
     expect(testFood.Energy).toBe(0)
-
-    testWorld.Thick()
-    expect(testFood.Exist).toBeFalsy()
-    const testPlace = testWorld.GetPlace(x, y)
-    expect(testPlace).toBeNull()
-
-    testFood.Thick()
-    expect(testFood.Exist).toBeFalsy()
   })
 })

@@ -1,5 +1,13 @@
 import { IWorldObject } from '../Interfaces/IWorldObject'
 
+export enum WorldObjectTypes {
+  Food = 'F',
+  Animal = 'A',
+  Water = 'W',
+  Mountain = 'M',
+  Test = 'T',
+}
+
 export type WorldObjectStart = {
   WorldX: number,
   WorldY: number
@@ -8,18 +16,18 @@ export type WorldObjectStart = {
 }
 
 export default class WorldObject implements IWorldObject {
-  Type: string
+  Type: WorldObjectTypes
   WorldX: number
   WorldY: number
   Id: string
-  Name?: string | undefined
+  Name?: string
   Exist: boolean
-  Energy: number
+  Energy?: number
   IsMoveable: boolean
 
-  constructor(startValues: WorldObjectStart, type: string, IsMoveable = false) {
+  constructor(startValues: WorldObjectStart, type: WorldObjectTypes, IsMoveable = false) {
     this.Type = type
-    this.Id = type.substring(0, 1) + startValues.Id
+    this.Id = `${type}${startValues.Id}`
     this.Exist = true
     this.WorldX = startValues.WorldX
     this.WorldY = startValues.WorldY
@@ -28,8 +36,8 @@ export default class WorldObject implements IWorldObject {
   }
 
   Thick() {
-    // Universal rule: no energy = not existing
-    if (this.Energy <= 0) {
+    // Universal rule: no energy left = not existing
+    if (this.Energy !== undefined && this.Energy <= 0) {
       this.Exist = false
       this.WorldX = -1
       this.WorldY = -1
