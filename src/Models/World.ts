@@ -4,7 +4,6 @@ import Animal from './Animal'
 import Food from './Food'
 import WorldObject, { WorldObjectTypes } from './WorldObject'
 
-
 export function RandomCoord(maxX: number, maxY: number) {
   const x = Math.floor(Math.random() * maxX)
   const y = Math.floor(Math.random() * maxY)
@@ -60,7 +59,7 @@ export default class World {
   private _addStartObjects(objectType: WorldObjectTypes) {
     const amount: number = CstWorld.StartAmount[objectType]
     for (let id = 0; id < amount; id++) {
-      const { x, y } = RandomCoord(CstWorld.Size.X, CstWorld.Size.Y)
+      const { x, y } = this.RandomUnoccupiedCoord()
       // TODO: check is place is empty before adding above it
       let newWorldObject: WorldObject | null = null
 
@@ -105,6 +104,17 @@ export default class World {
   }
 
 
+  RandomUnoccupiedCoord(notX = 0, notY = 0) {
+    const { x, y } = RandomCoord(this.SizeX, this.SizeY)
+    // check for existing world object
+    const checkOccupied = this._Places[y][x]
+    if (checkOccupied && checkOccupied.Exist) this.RandomUnoccupiedCoord(notX, notY)
+    // extra check : usecase new food must not be at original place (animal has'nt moved yet)    
+    if (x === notX && y === notY) this.RandomUnoccupiedCoord(notX, notY)
+    return { x, y }
+  }
+
+
   Guard(x: number, y: number) {
     let checkedX = x
     let checkedY = y
@@ -139,7 +149,7 @@ export default class World {
           // ==> don't move into occupied place, stay in previous place & stop movement
           // ==> check if collision is with Food --> eat food
           const occupied = this._Places[checkedY][checkedX]
-          if (occupied) { this.collisionDetected(occupied, animal, orgX, orgY) }
+          if (occupied && occupied.Exist) { this.collisionDetected(occupied, animal, orgX, orgY) }
 
           //  remove previous location, add new location
           if (orgX != worldObject.WorldX || orgY != worldObject.WorldY) {
@@ -171,6 +181,9 @@ export default class World {
     animal.WorldX = orgX
     animal.WorldY = orgY
     animal.Movement.Stop()
+    // // after collision turn 180°
+    // animal.Movement.DirectionX = -animal.Movement.DirectionX
+    // animal.Movement.DirectionY = -animal.Movement.DirectionY
 
     // collision with Food --> eat food (add energy, remove this food, add new food)
     if (occupied.Type === WorldObjectTypes.Food) {
@@ -180,7 +193,7 @@ export default class World {
       // remove food immediately, not in next thick
       this._Places[occupied.WorldY][occupied.WorldX] = null
       //  add new food 
-      const { x, y } = RandomCoord(this.SizeX, this.SizeY)
+      const { x, y } = this.RandomUnoccupiedCoord(orgX, orgY)
       const newFood = new Food({ WorldX: x, WorldY: y, Id: this._Items.length })
       this.AddObject(newFood)
     }

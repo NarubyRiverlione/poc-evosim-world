@@ -8,13 +8,16 @@ StartWorld.Seed()
 
 // RUN SIMULATION
 let simTicks = 0
-setInterval(() => {
+let run = setInterval(() => {
   simTicks += 1
   StartWorld.Thick()
+
+  // stop sim if there are no animals left
+  if (StartWorld.GetAllAnimals().length === 0) {
+    clearInterval(run)
+  }
+
   ShowAll(simTicks, StartWorld)
   ShownAnimals(StartWorld)
-}, 3000)
-
-// StartWorld.Thick()
-// ShowAll(0, StartWorld)
+}, 1000)
 
