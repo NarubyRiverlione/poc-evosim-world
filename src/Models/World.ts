@@ -1,9 +1,8 @@
-import { CstWorld } from '../Cst'
+import { CstAnimal, CstWorld } from '../Cst'
 import { IWorldObject } from '../Interfaces/IWorldObject'
 import Animal from './Animal'
 import Food from './Food'
 import WorldObject, { WorldObjectTypes } from './WorldObject'
-
 
 export function RandomCoord(maxX: number, maxY: number) {
   const x = Math.floor(Math.random() * maxX)
@@ -60,7 +59,7 @@ export default class World {
   private _addStartObjects(objectType: WorldObjectTypes) {
     const amount: number = CstWorld.StartAmount[objectType]
     for (let id = 0; id < amount; id++) {
-      const { x, y } = RandomCoord(CstWorld.Size.X, CstWorld.Size.Y)
+      const { x, y } = this.RandomUnoccupiedCoord()
       // TODO: check is place is empty before adding above it
       let newWorldObject: WorldObject | null = null
 
@@ -71,10 +70,14 @@ export default class World {
         case WorldObjectTypes.Animal:
           newWorldObject = new Animal({ WorldX: x, WorldY: y, Id: id }); break
 
-        case WorldObjectTypes.Water, WorldObjectTypes.Mountain:
+        case WorldObjectTypes.Water:
+        case WorldObjectTypes.Mountain:
           newWorldObject = new WorldObject({ WorldX: x, WorldY: y, Id: id }, objectType); break
       }
+
+      /* istanbul ignore next */
       if (!newWorldObject) throw new Error('Could\'t create world object of type ' + objectType)
+
       this.AddObject(newWorldObject)
     }
   }
@@ -102,6 +105,17 @@ export default class World {
   RemoveObject(x: number, y: number) {
     this._Places[y][x] = null
     // keep not-existing world object in items array for history analyse
+  }
+
+
+  RandomUnoccupiedCoord(notX = 0, notY = 0) {
+    const { x, y } = RandomCoord(this.SizeX, this.SizeY)
+    // check for existing world object
+    const checkOccupied = this._Places[y][x]
+    if (checkOccupied && checkOccupied.Exist) this.RandomUnoccupiedCoord(notX, notY)
+    // extra check : use case new food must not be at original place (animal has'nt moved yet)    
+    if (x === notX && y === notY) this.RandomUnoccupiedCoord(notX, notY)
+    return { x, y }
   }
 
 
@@ -139,7 +153,7 @@ export default class World {
           // ==> don't move into occupied place, stay in previous place & stop movement
           // ==> check if collision is with Food --> eat food
           const occupied = this._Places[checkedY][checkedX]
-          if (occupied) { this.collisionDetected(occupied, animal, orgX, orgY) }
+          if (occupied && occupied.Exist) { this.collisionDetected(occupied, animal, orgX, orgY) }
 
           //  remove previous location, add new location
           if (orgX != worldObject.WorldX || orgY != worldObject.WorldY) {
@@ -148,7 +162,12 @@ export default class World {
           }
 
           // find closed food --> update direction for next Thick
-          this.FindFood(animal)
+          this.FindTarget(animal, WorldObjectTypes.Food)
+          // only if thirst is above threshold, find water
+          if (animal.Thirst > CstAnimal.ThirstThreshold) {
+            this.FindTarget(animal, WorldObjectTypes.Water)
+          }
+
           animal.DirectionToTarget()
         }
         // // remove World object without energy
@@ -157,9 +176,9 @@ export default class World {
     })
   }
 
-  FindFood(animal: Animal) {
-    const foods = this._Items.filter(item => item.Exist && item.Type === WorldObjectTypes.Food)
-    animal.ClosestTarget(foods)
+  FindTarget(animal: Animal, targetType: WorldObjectTypes) {
+    const foundItems = this._Items.filter(item => item.Exist && item.Type === targetType)
+    animal.ClosestTarget(foundItems)
   }
   GetAllAnimals() {
     const animals = this._Items.filter(item => item.Exist && item.Type === WorldObjectTypes.Animal)
@@ -170,19 +189,27 @@ export default class World {
     // cancel move
     animal.WorldX = orgX
     animal.WorldY = orgY
-    animal.Movement.Stop()
 
     // collision with Food --> eat food (add energy, remove this food, add new food)
     if (occupied.Type === WorldObjectTypes.Food) {
+      animal.Movement.Stop() // trigger new target next thick
+
       const food = occupied as Food
       animal.Eat(food.Energy)
       food.Eaten()
       // remove food immediately, not in next thick
       this._Places[occupied.WorldY][occupied.WorldX] = null
       //  add new food 
-      const { x, y } = RandomCoord(this.SizeX, this.SizeY)
+      const { x, y } = this.RandomUnoccupiedCoord(orgX, orgY)
       const newFood = new Food({ WorldX: x, WorldY: y, Id: this._Items.length })
       this.AddObject(newFood)
+    }
+
+    // collision with Water --> drink water, water stays
+    if (occupied.Type === WorldObjectTypes.Water) {
+      animal.Drink()
+      // start wandering in the hope to move around the obstacle 
+      animal.Movement.IsWandering = true
     }
   }
 }

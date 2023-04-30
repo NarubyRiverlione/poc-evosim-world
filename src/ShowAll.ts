@@ -5,13 +5,13 @@ import * as readline from 'readline'
 import { WorldObjectTypes } from './Models/WorldObject'
 
 function showAnimal(animal: Animal) {
-  const { Id, Energy, Target, Movement, Distance, WorldX, WorldY } = animal
+  const { Id, Energy, Target, Movement, Distance, WorldX, WorldY, Thirst } = animal
 
-  let showRow = `${Id} X${WorldX}Y${WorldY} E${Energy}`
+  let showRow = `${Id} X${WorldX}Y${WorldY} E${Energy} th${Thirst}`
   // showRow += `--> ${Movement?.DirectionX}/${Movement?.DirectionY} ${Distance} `
 
-  if (Movement.IsWandering) showRow += ` W${Movement.WanderingStepsToMake}`
-  if (Target) showRow += ` ${Target.Id}D${Distance}`
+  if (Movement.IsWandering) showRow += ` Wandering steps ${Movement.WanderingStepsToMake}`
+  if (Target) showRow += ` ${Target.Id}  X${Target.WorldX}Y${Target.WorldY}  D${Distance}`
   process.stdout.write(`${showRow} \n \n`)
 }
 
@@ -25,26 +25,19 @@ export function ShowAll(simThick: number, world: World) {
     for (let x = 0; x < world.SizeX; x++) {
       const place = world.GetPlace(x, y)
 
-      if (!place || !place.Exist) { showRow = `${showRow} ------`; continue }
+      if (!place || !place.Exist) { showRow = `${showRow}    `; continue }
 
       const { Type, Id } = place
       switch (Type) {
         case WorldObjectTypes.Water:
-          showRow = `${showRow} WWWWW`; continue
+          showRow = `${showRow}WW${Id}WW`; continue
         case WorldObjectTypes.Mountain:
-          showRow = `${showRow} MMMMM`; continue
+          showRow = `${showRow}MMMMM`; continue
         case WorldObjectTypes.Food:
-          showRow = `${showRow} *${Id}*`; continue
+          showRow = `${showRow}*${Id}*`; continue
         default:
           showRow = `${showRow} ${Id} `
       }
-
-      // if (Type === CstWorldObjects.Animal) {
-      //   const animal = place as Animal
-      //   const { Movement, Distance, Target } = animal
-      //   if (Movement.IsWandering) showRow += `W${Movement.WanderingStepsToMake}`
-      //   if (Target) showRow += `${Target.Id}D${Distance}`
-      // }
     }
 
     process.stdout.write(`${showRow} \n`)
