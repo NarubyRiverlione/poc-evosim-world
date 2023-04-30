@@ -1,4 +1,4 @@
-import { CstWorld } from '../src/Cst'
+import { CstAnimal, CstWorld } from '../src/Cst'
 import Animal from '../src/Models/Animal'
 import Food from '../src/Models/Food'
 import World, { RandomCoord } from '../src/Models/World'
@@ -84,10 +84,12 @@ describe('World', () => {
       expect(checkedX).toBe(testSizeX - 1)
       expect(checkedY).toBe(testSizeY - 1)
     })
-  })
+    it('Seed', () => {
+      testWorld.Seed()
+      expect(testWorld.GetAllAnimals().length).toBe(CstWorld.StartAmount[WorldObjectTypes.Animal])
+    })
 
-  // describe('World seed terrain', () => {
-  // })
+  })
 
   describe('World add/remove objects', () => {
     it('Place World object', () => {
@@ -171,12 +173,29 @@ describe('World', () => {
       // try move test item to left, into occupied place --> should stay in previous place
       testWorld.Thick()
       const expectEnergy = CstWorld.StartEnergy[WorldObjectTypes.Animal]
-        - CstWorld.Animal.MoveEnergy + CstWorld.StartEnergy[WorldObjectTypes.Food]
+        - CstAnimal.MoveEnergy + CstWorld.StartEnergy[WorldObjectTypes.Food]
       expect(testWorld.GetPlace(foodX, foodY)).toBeNull()
       expect(testWorldObject.Energy).toBe(expectEnergy)
 
       testWorld.Thick()
       expect(testFood.Exist).toBeFalsy()
+    })
+    it('Collision with water = dring water ', () => {
+      // food  at foodX & occupyY
+      const { x: waterX, y: waterY } = RandomCoord(testSizeX, testSizeY)
+      const testWater = new WorldObject({ WorldX: waterX, WorldY: waterY, Id: 1234 }, WorldObjectTypes.Water)
+      testWorld.AddObject(testWater)
+      // place test item right to food
+      const testAnimal = new Animal({ WorldX: waterX + 2, WorldY: waterY, Id: 456 })
+      testWorld.AddObject(testAnimal)
+      testAnimal.Movement.DirectionX = -1
+      testAnimal.Movement.DirectionY = 0
+      testAnimal.Movement.WanderingStepsToMake = 2
+      // try move test item to left, into occupied place --> should stay in previous place
+      testWorld.Thick()
+      expect(testAnimal.Thirst).toBe(1)
+      testWorld.Thick() // drink = no thirst
+      expect(testAnimal.Thirst).toBe(0)
     })
   })
 

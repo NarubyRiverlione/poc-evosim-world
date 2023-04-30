@@ -1,4 +1,4 @@
-import { CstWorld } from '../Cst'
+import { CstAnimal, CstWorld } from '../Cst'
 import { IWorldObject } from '../Interfaces/IWorldObject'
 import Animal from './Animal'
 import Food from './Food'
@@ -70,10 +70,14 @@ export default class World {
         case WorldObjectTypes.Animal:
           newWorldObject = new Animal({ WorldX: x, WorldY: y, Id: id }); break
 
-        case WorldObjectTypes.Water, WorldObjectTypes.Mountain:
+        case WorldObjectTypes.Water:
+        case WorldObjectTypes.Mountain:
           newWorldObject = new WorldObject({ WorldX: x, WorldY: y, Id: id }, objectType); break
       }
+
+      /* istanbul ignore next */
       if (!newWorldObject) throw new Error('Could\'t create world object of type ' + objectType)
+
       this.AddObject(newWorldObject)
     }
   }
@@ -109,7 +113,7 @@ export default class World {
     // check for existing world object
     const checkOccupied = this._Places[y][x]
     if (checkOccupied && checkOccupied.Exist) this.RandomUnoccupiedCoord(notX, notY)
-    // extra check : usecase new food must not be at original place (animal has'nt moved yet)    
+    // extra check : use case new food must not be at original place (animal has'nt moved yet)    
     if (x === notX && y === notY) this.RandomUnoccupiedCoord(notX, notY)
     return { x, y }
   }
@@ -158,7 +162,12 @@ export default class World {
           }
 
           // find closed food --> update direction for next Thick
-          this.FindFood(animal)
+          this.FindTarget(animal, WorldObjectTypes.Food)
+          // only if thirst is above threshold, find water
+          if (animal.Thirst > CstAnimal.ThirstThreshold) {
+            this.FindTarget(animal, WorldObjectTypes.Water)
+          }
+
           animal.DirectionToTarget()
         }
         // // remove World object without energy
@@ -167,9 +176,9 @@ export default class World {
     })
   }
 
-  FindFood(animal: Animal) {
-    const foods = this._Items.filter(item => item.Exist && item.Type === WorldObjectTypes.Food)
-    animal.ClosestTarget(foods)
+  FindTarget(animal: Animal, targetType: WorldObjectTypes) {
+    const foundItems = this._Items.filter(item => item.Exist && item.Type === targetType)
+    animal.ClosestTarget(foundItems)
   }
   GetAllAnimals() {
     const animals = this._Items.filter(item => item.Exist && item.Type === WorldObjectTypes.Animal)
@@ -180,13 +189,11 @@ export default class World {
     // cancel move
     animal.WorldX = orgX
     animal.WorldY = orgY
-    animal.Movement.Stop()
-    // // after collision turn 180°
-    // animal.Movement.DirectionX = -animal.Movement.DirectionX
-    // animal.Movement.DirectionY = -animal.Movement.DirectionY
 
     // collision with Food --> eat food (add energy, remove this food, add new food)
     if (occupied.Type === WorldObjectTypes.Food) {
+      animal.Movement.Stop() // trigger new target next thick
+
       const food = occupied as Food
       animal.Eat(food.Energy)
       food.Eaten()
@@ -196,6 +203,13 @@ export default class World {
       const { x, y } = this.RandomUnoccupiedCoord(orgX, orgY)
       const newFood = new Food({ WorldX: x, WorldY: y, Id: this._Items.length })
       this.AddObject(newFood)
+    }
+
+    // collision with Water --> drink water, water stays
+    if (occupied.Type === WorldObjectTypes.Water) {
+      animal.Drink()
+      // start wandering in the hope to move around the obstacle 
+      animal.Movement.IsWandering = true
     }
   }
 }

@@ -22,7 +22,7 @@ export default class WorldObject implements IWorldObject {
   Id: string
   Name?: string
   Exist: boolean
-  Energy?: number
+  Energy: number
   IsMoveable: boolean
 
   constructor(startValues: WorldObjectStart, type: WorldObjectTypes, IsMoveable = false) {

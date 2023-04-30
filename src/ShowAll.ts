@@ -5,12 +5,12 @@ import * as readline from 'readline'
 import { WorldObjectTypes } from './Models/WorldObject'
 
 function showAnimal(animal: Animal) {
-  const { Id, Energy, Target, Movement, Distance, WorldX, WorldY } = animal
+  const { Id, Energy, Target, Movement, Distance, WorldX, WorldY, Thirst } = animal
 
-  let showRow = `${Id} X${WorldX}Y${WorldY} E${Energy}`
+  let showRow = `${Id} X${WorldX}Y${WorldY} E${Energy} th${Thirst}`
   // showRow += `--> ${Movement?.DirectionX}/${Movement?.DirectionY} ${Distance} `
 
-  if (Movement.IsWandering) showRow += ` W${Movement.WanderingStepsToMake}`
+  if (Movement.IsWandering) showRow += ` Wandering steps ${Movement.WanderingStepsToMake}`
   if (Target) showRow += ` ${Target.Id}  X${Target.WorldX}Y${Target.WorldY}  D${Distance}`
   process.stdout.write(`${showRow} \n \n`)
 }
@@ -30,7 +30,7 @@ export function ShowAll(simThick: number, world: World) {
       const { Type, Id } = place
       switch (Type) {
         case WorldObjectTypes.Water:
-          showRow = `${showRow}WWWWW`; continue
+          showRow = `${showRow}WW${Id}WW`; continue
         case WorldObjectTypes.Mountain:
           showRow = `${showRow}MMMMM`; continue
         case WorldObjectTypes.Food:
