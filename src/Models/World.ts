@@ -11,7 +11,7 @@ export function RandomCoord(maxX: number, maxY: number) {
 }
 
 export default class World {
-  private _Grid: string[]                    // grid of passable terrain
+  // private _Grid: string[]                    // grid of passable terrain
   private _Places: (WorldObject | null)[][]  // potential content of a terrain
   private _Items: WorldObject[]              // all world objects ever in existence in the world
   SizeX: number
@@ -22,11 +22,8 @@ export default class World {
     if (sizeY <= 0) throw new Error('Invalid size for Y when creating world')
     this.SizeX = sizeX
     this.SizeY = sizeY
-
+    // this._Grid = []
     this._Items = []
-
-    this._Grid = []
-
     this._Places = []
     this.initWorld()
   }
@@ -41,20 +38,20 @@ export default class World {
       this._Places.push(emptyPlaceRow)
     }
   }
-  // create movable grid for pathfinding
-  private _createGrid() {
-    this._Grid = []
-    for (let y = 0; y < this.SizeY; y++) {
-      let terrainRow = ''
-      for (let x = 0; x < this.SizeX; x++) {
-        const isOccupied = this._Places[y][x]?.Exist ? '1' : '0'
-        terrainRow = `${terrainRow}${isOccupied},`
-      }
-      terrainRow = terrainRow.substring(0, terrainRow.length - 1) // remove last ','
-      this._Grid.push(terrainRow)
-    }
+  // // create movable grid for pathfinding
+  // private _createGrid() {
+  //   this._Grid = []
+  //   for (let y = 0; y < this.SizeY; y++) {
+  //     let terrainRow = ''
+  //     for (let x = 0; x < this.SizeX; x++) {
+  //       const isOccupied = this._Places[y][x]?.Exist ? '1' : '0'
+  //       terrainRow = `${terrainRow}${isOccupied},`
+  //     }
+  //     terrainRow = terrainRow.substring(0, terrainRow.length - 1) // remove last ','
+  //     this._Grid.push(terrainRow)
+  //   }
 
-  }
+  // }
 
   private _addStartObjects(objectType: WorldObjectTypes) {
     const amount: number = CstWorld.StartAmount[objectType]
@@ -131,7 +128,8 @@ export default class World {
   }
 
   Thick() {
-    this._createGrid()
+    // this._createGrid()
+
     // Thick all existing WorldObjects
     this._Items.forEach(worldObject => {
       // doesn't exist any more --> no need for thick
@@ -189,6 +187,8 @@ export default class World {
     // cancel move
     animal.WorldX = orgX
     animal.WorldY = orgY
+    // start wandering in the hope to move around the obstacle 
+    animal.Movement.StartWandering()
 
     // collision with Food --> eat food (add energy, remove this food, add new food)
     if (occupied.Type === WorldObjectTypes.Food) {
@@ -208,8 +208,8 @@ export default class World {
     // collision with Water --> drink water, water stays
     if (occupied.Type === WorldObjectTypes.Water) {
       animal.Drink()
-      // start wandering in the hope to move around the obstacle 
-      animal.Movement.IsWandering = true
+
+
     }
   }
 }

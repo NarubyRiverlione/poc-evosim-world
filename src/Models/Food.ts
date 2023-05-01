@@ -10,7 +10,7 @@ export default class Food extends WorldObject {
 
   Eaten() {
     this.Energy = 0
-    // this.Exist = false
+    this.Thick()
   }
 
   Thick(): void {

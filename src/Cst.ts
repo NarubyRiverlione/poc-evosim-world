@@ -3,8 +3,8 @@ import { WorldObjectTypes } from './Models/WorldObject'
 export const CstWorld = {
   Size: { X: 25, Y: 25 },
   StartAmount: {
-    [WorldObjectTypes.Food]: 12,
-    [WorldObjectTypes.Animal]: 3,
+    [WorldObjectTypes.Food]: 15,
+    [WorldObjectTypes.Animal]: 15,
     [WorldObjectTypes.Water]: 5,
     [WorldObjectTypes.Mountain]: 0,
     [WorldObjectTypes.Test]: 0,
@@ -26,8 +26,8 @@ export const CstAnimal = {
 }
 
 
-export const CstWorldTerrain = {
-  Empty: '0',
-  Water: '1',
-  Mountain: '2',
-}
+// export const CstWorldTerrain = {
+//   Empty: '0',
+//   Water: '1',
+//   Mountain: '2',
+// }

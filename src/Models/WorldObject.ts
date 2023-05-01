@@ -39,8 +39,8 @@ export default class WorldObject implements IWorldObject {
     // Universal rule: no energy left = not existing
     if (this.Energy !== undefined && this.Energy <= 0) {
       this.Exist = false
-      this.WorldX = -1
-      this.WorldY = -1
+      // this.WorldX = -1
+      // this.WorldY = -1
       this.IsMoveable = false
     }
   }

@@ -19,5 +19,5 @@ let run = setInterval(() => {
 
   ShowAll(simTicks, StartWorld)
   ShownAnimals(StartWorld)
-}, 1000)
+}, 500)
 

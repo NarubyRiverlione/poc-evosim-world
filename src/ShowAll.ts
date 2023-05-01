@@ -12,7 +12,7 @@ function showAnimal(animal: Animal) {
 
   if (Movement.IsWandering) showRow += ` Wandering steps ${Movement.WanderingStepsToMake}`
   if (Target) showRow += ` ${Target.Id}  X${Target.WorldX}Y${Target.WorldY}  D${Distance}`
-  process.stdout.write(`${showRow} \n \n`)
+  process.stdout.write(`${showRow} \n`)
 }
 
 export function ShowAll(simThick: number, world: World) {
