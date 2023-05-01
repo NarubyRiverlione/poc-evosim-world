@@ -15,9 +15,10 @@ export default class Animal extends WorldObject {
   private _seeRange: number
   private _thirst: number
   private _age: number
-  private _closestDistance
+  private _closestDistance: number
+  private _parentId?: string
 
-  constructor(startValues: WorldObjectStart, seeRange = CstAnimal.SeeRange) {
+  constructor(startValues: WorldObjectStart, seeRange = CstAnimal.SeeRange, parentId?: string) {
     super(startValues, WorldObjectTypes.Animal, true)
     // default behavior is start wandering
     this.Movement = new Movement(CstAnimal.RandomSteps)
@@ -27,6 +28,7 @@ export default class Animal extends WorldObject {
     this._thirst = 0
     this._age = 0
     this._closestDistance = 0
+    this._parentId = parentId
   }
 
   get Age() { return this._age }
@@ -40,6 +42,7 @@ export default class Animal extends WorldObject {
     // thirst above threshold: movement cost more energy
     this.Energy -= CstAnimal.MoveEnergy * ThirstEnergyFactor(this.Thirst, CstAnimal.ThirstThreshold)
     this._thirst += CstAnimal.ThirstThick
+
     super.Thick()
   }
 
@@ -52,6 +55,21 @@ export default class Animal extends WorldObject {
   }
   Drink() {
     this._thirst = 0
+  }
+  CreateOffspring(newId: number): Animal {
+    // new animal spawn after parent (safe, unoccupied because parent came for that direction ?)    
+    const x = this.WorldX - this.Movement?.DirectionX
+    const y = this.WorldY - this.Movement?.DirectionY
+
+    // TODO mutation SeeRange
+    const newSeeRange = this.SeeRange
+
+    const offspring = new Animal({ WorldX: x, WorldY: y, Id: newId }, newSeeRange, this.Id)
+
+    // remove energy from parent to prevent continues offspring creation
+    this.Energy -= CstWorld.StartEnergy[WorldObjectTypes.Animal]
+
+    return offspring
   }
 
   DirectionToTarget() {

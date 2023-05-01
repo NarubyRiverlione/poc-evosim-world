@@ -58,14 +58,10 @@ describe('Move to goal', () => {
     testMovement.DirectionToGoal(10, 10, 11, 10)
     expect(testMovement.DirectionY).toBe(0)
   })
-  it('reached goal, no movement', () => {
+  it('reached goal, start wandering', () => {
     const testMovement = new Movement()
-
     testMovement.DirectionToGoal(10, 10, 10, 10)
-
-    expect(testMovement.IsWandering).toBeFalsy()
-    expect(testMovement.DirectionX).toBe(0)
-    expect(testMovement.DirectionY).toBe(0)
+    expect(testMovement.IsWandering).toBeTruthy()
   })
 
 })

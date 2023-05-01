@@ -69,7 +69,7 @@ describe('Animal', () => {
       expect(testAnimal.Energy).toBe(expectThresholdStep3)
     })
   })
-  describe('target', () => {
+  describe('Target', () => {
     it('Closest target', () => {
       const testAnimal = new Animal({ WorldX: 20, WorldY: 20, Id: 1 }, 20)
       const { WorldX: x, WorldY: y } = testAnimal
@@ -113,6 +113,21 @@ describe('Animal', () => {
       expect(testAnimal.Target).toEqual(target1)
       const expectDistance = parseInt(Math.sqrt(Math.pow(offsetX, 2) + Math.pow(offsetY, 2)).toFixed(1))
       expect(testAnimal.Distance).toBe(expectDistance)
+    })
+  })
+  describe('Offspring', () => {
+    it('create offspring', () => {
+      const maxAnimalId = 153
+      const seeRange = Math.floor(Math.random() * 20)
+      const parentEatEnergy = Math.floor(Math.random() * 100)
+      const parentAnimal = new Animal({ WorldX: 20, WorldY: 20, Id: maxAnimalId }, seeRange)
+      parentAnimal.Eat(parentEatEnergy)
+
+      const offspring = parentAnimal.CreateOffspring(maxAnimalId + 1)
+      expect(offspring.Age).toBe(0)
+
+      const expectParentEnergy = parentEatEnergy
+      expect(parentAnimal.Energy).toBe(expectParentEnergy)
     })
   })
 })

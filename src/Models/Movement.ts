@@ -58,12 +58,11 @@ export default class Movement implements IMovement {
 
   DirectionToGoal(currentX: number, currentY: number, goalX: number, goalY: number) {
 
-    //  collision preventing is done in World thick
+    //  actions after collision are done in World thick
+    // this "above" other item should 'never' happen
     if (currentX === goalX && currentY === goalY) {
-      this.Stop()
-      // TODO restart wandering now goal is reached ?
-      // this.IsWandering = true
-      return
+      this.StartWandering()
+      return // stay this Thick at current place
     }
 
     this.DirectionX = directionTo(goalX, currentX)

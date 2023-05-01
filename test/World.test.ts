@@ -223,11 +223,9 @@ describe('World', () => {
       expect(testAnimal.WorldY).toBe(y)
 
       testWorld.Thick()  // 2th step too the food = collision,stay in prev
-      expect(testAnimal.Movement.DirectionX).toBe(1)
-      expect(testAnimal.Movement.DirectionY).toBe(0)
       expect(testAnimal.WorldX).toBe(x + 1)
       expect(testAnimal.WorldY).toBe(y)
-
+      expect(testAnimal.Movement.IsWandering).toBeTruthy()
     })
 
   })

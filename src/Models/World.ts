@@ -1,3 +1,4 @@
+import { off } from 'process'
 import { CstAnimal, CstWorld } from '../Cst'
 import { IWorldObject } from '../Interfaces/IWorldObject'
 import Animal from './Animal'
@@ -57,7 +58,6 @@ export default class World {
     const amount: number = CstWorld.StartAmount[objectType]
     for (let id = 0; id < amount; id++) {
       const { x, y } = this.RandomUnoccupiedCoord()
-      // TODO: check is place is empty before adding above it
       let newWorldObject: WorldObject | null = null
 
       switch (objectType) {
@@ -167,6 +167,13 @@ export default class World {
           }
 
           animal.DirectionToTarget()
+
+          // offspring
+          if (animal.Energy > CstAnimal.OffspringThresholdEnergy) {
+            const newId = this._Items.filter(item => item.Type === WorldObjectTypes.Animal).length
+            const offspring = animal.CreateOffspring(newId)
+            this.AddObject(offspring)
+          }
         }
         // // remove World object without energy
         if (worldObject.Energy !== undefined && worldObject.Energy <= 0) { this._Places[orgY][orgX] = null }
@@ -192,7 +199,8 @@ export default class World {
 
     // collision with Food --> eat food (add energy, remove this food, add new food)
     if (occupied.Type === WorldObjectTypes.Food) {
-      animal.Movement.Stop() // trigger new target next thick
+
+      //      animal.Movement.Stop() // trigger new target next thick
 
       const food = occupied as Food
       animal.Eat(food.Energy)
@@ -208,8 +216,7 @@ export default class World {
     // collision with Water --> drink water, water stays
     if (occupied.Type === WorldObjectTypes.Water) {
       animal.Drink()
-
-
     }
   }
+
 }
