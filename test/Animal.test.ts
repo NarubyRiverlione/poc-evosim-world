@@ -1,4 +1,4 @@
-import { CstAnimal } from '../src/Cst'
+import { CstAnimal, CstWorld } from '../src/Cst'
 import Animal, { ThirstEnergyFactor } from '../src/Models/Animal'
 import { RandomCoord } from '../src/Models/World'
 import WorldObject, { WorldObjectTypes } from '../src/Models/WorldObject'
@@ -119,14 +119,14 @@ describe('Animal', () => {
     it('create offspring', () => {
       const maxAnimalId = 153
       const seeRange = Math.floor(Math.random() * 20)
-      const parentEatEnergy = Math.floor(Math.random() * 100)
+      const parentEatEnergy = Math.floor(Math.random() * 20) + CstAnimal.OffspringThresholdEnergy
       const parentAnimal = new Animal({ WorldX: 20, WorldY: 20, Id: maxAnimalId }, seeRange)
       parentAnimal.Eat(parentEatEnergy)
-
+      expect(parentAnimal.Energy).toBe(parentEatEnergy + CstWorld.StartEnergy[WorldObjectTypes.Animal])
       const offspring = parentAnimal.CreateOffspring(maxAnimalId + 1)
       expect(offspring.Age).toBe(0)
 
-      const expectParentEnergy = parentEatEnergy
+      const expectParentEnergy = parentEatEnergy - CstWorld.StartEnergy[WorldObjectTypes.Animal]
       expect(parentAnimal.Energy).toBe(expectParentEnergy)
     })
   })

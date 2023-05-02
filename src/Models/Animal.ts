@@ -42,10 +42,10 @@ export default class Animal extends WorldObject {
     // thirst above threshold: movement cost more energy
     this.Energy -= CstAnimal.MoveEnergy * ThirstEnergyFactor(this.Thirst, CstAnimal.ThirstThreshold)
     this._thirst += CstAnimal.ThirstThick
-
     super.Thick()
   }
 
+  get Parent() { return this._parentId }
   get Distance(): number {
     return parseInt(this._closestDistance.toFixed(1))
   }
@@ -56,18 +56,14 @@ export default class Animal extends WorldObject {
   Drink() {
     this._thirst = 0
   }
-  CreateOffspring(newId: number): Animal {
-    // new animal spawn after parent (safe, unoccupied because parent came for that direction ?)    
-    const x = this.WorldX - this.Movement?.DirectionX
-    const y = this.WorldY - this.Movement?.DirectionY
-
+  CreateOffspring(x: number, y: number, newId: number): Animal {
     // TODO mutation SeeRange
     const newSeeRange = this.SeeRange
 
     const offspring = new Animal({ WorldX: x, WorldY: y, Id: newId }, newSeeRange, this.Id)
 
     // remove energy from parent to prevent continues offspring creation
-    this.Energy -= CstWorld.StartEnergy[WorldObjectTypes.Animal]
+    this.Energy -= CstWorld.StartEnergy[WorldObjectTypes.Animal] * 2
 
     return offspring
   }

@@ -86,7 +86,7 @@ describe('World', () => {
     })
     it('Seed', () => {
       testWorld.Seed()
-      expect(testWorld.GetAllAnimals().length).toBe(CstWorld.StartAmount[WorldObjectTypes.Animal])
+      expect(testWorld.AnimalCount).toBe(CstWorld.StartAmount[WorldObjectTypes.Animal])
     })
 
   })
@@ -123,7 +123,7 @@ describe('World', () => {
       testWorld.AddObject(testAnimal3)
       testAnimal3.Exist = false
 
-      const allExistingAnimals = testWorld.GetAllAnimals()
+      const allExistingAnimals = testWorld.AllExistingAnimals()
       expect(allExistingAnimals).toEqual([testAnimal1, testAnimal2])
     })
 
