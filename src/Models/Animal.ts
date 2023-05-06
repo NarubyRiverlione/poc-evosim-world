@@ -20,7 +20,7 @@ export default class Animal extends WorldObject {
 
   constructor(startValues: WorldObjectStart, seeRange = CstAnimal.SeeRange, parentId?: string) {
     super(startValues, WorldObjectTypes.Animal, true)
-    // default behavior is start wandering
+
     this.Movement = new Movement(CstAnimal.RandomSteps)
     this._seeRange = seeRange
     this._target = null
@@ -42,19 +42,22 @@ export default class Animal extends WorldObject {
     // thirst above threshold: movement cost more energy
     this.Energy -= CstAnimal.MoveEnergy * ThirstEnergyFactor(this.Thirst, CstAnimal.ThirstThreshold)
     this._thirst += CstAnimal.ThirstThick
+    this.DirectionToTarget()
     super.Thick()
   }
 
   get Parent() { return this._parentId }
   get Distance(): number {
-    return parseInt(this._closestDistance.toFixed(1))
+    return parseFloat(this._closestDistance.toFixed(1))
   }
 
   Eat(addEnergy: number) {
     this.Energy += addEnergy
+    this._target = null
   }
   Drink() {
     this._thirst = 0
+    this._target = null
   }
   CreateOffspring(x: number, y: number, newId: number): Animal {
     // TODO mutation SeeRange
@@ -75,7 +78,7 @@ export default class Animal extends WorldObject {
     }
     if (!this._target) {
       // console.debug('no target to determine direction, start wandering')
-      this.Movement.IsWandering = true
+      this.Movement.StartWandering()
       return
     }
 
@@ -83,6 +86,10 @@ export default class Animal extends WorldObject {
   }
 
   ClosestTarget(targets: WorldObject[]) {
+    // as long target exist, don't look for new one (prevent flip-flop)
+    if (this._target && this._target?.Exist) return
+
+
     this._closestDistance = 0
     this._target = null
 

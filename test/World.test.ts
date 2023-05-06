@@ -149,15 +149,19 @@ describe('World', () => {
         WorldObjectTypes.Mountain)
       testWorld.AddObject(occupiedWorldObject)
       // place test item right to occupyX
-      const testWorldObject = new Animal({ WorldX: occupyX + 1, WorldY: occupyY, Id: 456, Energy: 100 })
-      testWorld.AddObject(testWorldObject)
-      testWorldObject.Movement.DirectionX = -1
-      testWorldObject.Movement.DirectionY = 0
-      testWorldObject.Movement.WanderingStepsToMake = 2
-      // try move test item to left, into occupied place --> should stay in previous place
+      const testAnimal = new Animal({ WorldX: occupyX + 1, WorldY: occupyY, Id: 456, Energy: 100 })
+      testWorld.AddObject(testAnimal)
+      testAnimal.Movement.DirectionX = -1
+      testAnimal.Movement.DirectionY = 0
+      testAnimal.Movement.WanderingStepsToMake = 2
+      // try move test item to left, into occupied place 
+      // --> should stay in previous place
+      // -> should start wandering to go around occupied place
       testWorld.Thick()
-
-      expect(testWorldObject.WorldX).toBe(occupyX + 1)
+      expect(testAnimal.Target).toBeNull()
+      expect(testAnimal.Movement.IsWandering).toBeTruthy()
+      expect(testAnimal.WorldX).toBe(occupyX + 1)
+      expect(testAnimal.WorldY).toBe(occupyY)
     })
     it('Collision with food = eat food --> add energy, remove food', () => {
       // food  at foodX & occupyY
@@ -185,7 +189,7 @@ describe('World', () => {
       const { x: waterX, y: waterY } = RandomCoord(testSizeX, testSizeY)
       const testWater = new WorldObject({ WorldX: waterX, WorldY: waterY, Id: 1234 }, WorldObjectTypes.Water)
       testWorld.AddObject(testWater)
-      // place test item right to food
+      // place test item right to water
       const testAnimal = new Animal({ WorldX: waterX + 2, WorldY: waterY, Id: 456 })
       testWorld.AddObject(testAnimal)
       testAnimal.Movement.DirectionX = -1
@@ -194,6 +198,11 @@ describe('World', () => {
       // try move test item to left, into occupied place --> should stay in previous place
       testWorld.Thick()
       expect(testAnimal.Thirst).toBe(1)
+      // overwrite movement (test animal isn't thirty)
+      testAnimal.Movement.DirectionX = -1
+      testAnimal.Movement.DirectionY = 0
+      testAnimal.Movement.WanderingStepsToMake = 2
+
       testWorld.Thick() // drink = no thirst
       expect(testAnimal.Thirst).toBe(0)
     })
@@ -201,23 +210,35 @@ describe('World', () => {
 
   describe('Animale find food', () => {
     it('find closest food & move too it', () => {
-      const x = Math.floor(testSizeX / 2)
-      const y = Math.floor(testSizeY / 2)
+      const startx = Math.floor(testSizeX / 2)
+      const starty = Math.floor(testSizeY / 2)
 
-      const testAnimal = new Animal({ WorldX: x, WorldY: y, Id: 1 }, 5)
+      const testAnimal = new Animal({ WorldX: startx, WorldY: starty, Id: 1 }, 5)
       testWorld.AddObject(testAnimal)
+      testWorld.Thick()  // first Thick: no movement
+      expect(testAnimal.Target).toBeNull()
+      expect(testAnimal.Movement.IsWandering).toBeTruthy()
+      // stop wandering
+      testAnimal.Movement.Stop()
+
+      // because of wandering it's only after 1 thick possible to add food
+      // on steady, testable locations
+      const { WorldX: x, WorldY: y } = testAnimal
       const food1 = new Food({ WorldX: x + 2, WorldY: y, Id: 1 })
       testWorld.AddObject(food1)
-      const food2 = new Food({ WorldX: x, WorldY: y + 3, Id: 2 })
+      const food2 = new Food({ WorldX: x + 4, WorldY: y + 4, Id: 2 })
       testWorld.AddObject(food2)
       const food3 = new Food({ WorldX: x + 10, WorldY: y + 10, Id: 3 })
       testWorld.AddObject(food3)
 
-      testWorld.Thick()  // first Thick set only the direction too the food, no steps
-      expect(testAnimal.Target?.Id).toBe(food1.Id)
 
-      testWorld.Thick()  // first step too the food
-      expect(testAnimal.Movement.DirectionX).toBe(+ 1)
+      testWorld.Thick()  // 2th thick: set only the target  not  direction, nor steps
+      expect(testAnimal.Target).toEqual(food1)
+
+
+      testWorld.Thick()  //  3th thick set direction & first step too the food
+      expect(testAnimal.Target).toEqual(food1)
+      expect(testAnimal.Movement.DirectionX).toBe(1)
       expect(testAnimal.Movement.DirectionY).toBe(0)
       expect(testAnimal.WorldX).toBe(x + 1)
       expect(testAnimal.WorldY).toBe(y)

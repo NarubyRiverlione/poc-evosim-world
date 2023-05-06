@@ -10,18 +10,20 @@ function showAnimal(animal: Animal) {
   let showRow = `${Id} X${WorldX}Y${WorldY} E${Energy} th${Thirst}`
   // showRow += `--> ${Movement?.DirectionX}/${Movement?.DirectionY} ${Distance} `
   if (Parent) showRow += ` Parent: ${Parent}`
-  if (Movement.IsWandering) showRow += ` Wandering steps ${Movement.WanderingStepsToMake}`
-  if (Target) showRow += ` ${Target.Id}  X${Target.WorldX}Y${Target.WorldY}  D${Distance}`
+  if (Movement.IsWandering)
+    showRow += ` Wandering steps ${Movement.WanderingStepsToMake}`
+  if (Target !== null) showRow += ` ${Target.Id}  X${Target.WorldX}Y${Target.WorldY}  D${Distance}`
   process.stdout.write(`${showRow} \n`)
 }
 
-export function ClearScreen(simThick: number, animalsCount: number) {
+export function ClearScreen(simThick: number, animalsCount: number, foodCount: number) {
   readline.cursorTo(process.stdout, 0, 0)
   readline.clearScreenDown(process.stdout)
-  process.stdout.write(`+++ SIM STEP ${simThick} Animals: ${animalsCount} +++++\n\n`)
+  process.stdout.write(`+++ SIM STEP ${simThick} Animals: ${animalsCount} Food:${foodCount} +++++\n\n`)
 }
 
 export function ShowAll(world: World) {
+  let testCount = 0
   for (let y = 0; y < world.SizeY; y++) {
     let showRow = ''
     for (let x = 0; x < world.SizeX; x++) {
@@ -32,11 +34,11 @@ export function ShowAll(world: World) {
       const { Type, Id } = place
       switch (Type) {
         case WorldObjectTypes.Water:
-          showRow = `${showRow}WW${Id}WW`; continue
+          showRow = `${showRow}WW${Id}WW`; break
         case WorldObjectTypes.Mountain:
-          showRow = `${showRow}MMMMM`; continue
+          showRow = `${showRow}MMMMM`; break
         case WorldObjectTypes.Food:
-          showRow = `${showRow}*${Id}*`; continue
+          showRow = `${showRow}*${Id}*`; testCount += 1; break
         default:
           showRow = `${showRow} ${Id} `
       }
@@ -46,6 +48,8 @@ export function ShowAll(world: World) {
   }
 
   process.stdout.write('\n\n')
+  process.stdout.write(testCount + '\n')
+
 }
 
 export function ShownAnimals(world: World) {

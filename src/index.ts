@@ -16,8 +16,8 @@ let run = setInterval(() => {
   if (StartWorld.AllExistingAnimals().length === 0) {
     clearInterval(run)
   }
-  ClearScreen(simTicks, StartWorld.AnimalCount)
-  // ShowAll(simTicks, StartWorld)
-  ShownAnimals(StartWorld)
-}, 500)
+  ClearScreen(simTicks, StartWorld.AnimalCount, StartWorld.FoodCount)
+  ShowAll(StartWorld)
+  // ShownAnimals(StartWorld)
+}, 100)
 

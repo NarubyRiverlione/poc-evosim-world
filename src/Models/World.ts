@@ -67,7 +67,9 @@ export default class World {
     this._addStartObjects(WorldObjectTypes.Mountain)
     this._addStartObjects(WorldObjectTypes.Water)
     this._addStartObjects(WorldObjectTypes.Food)
+    if (this.FoodCount !== CstWorld.StartAmount[WorldObjectTypes.Food]) debugger
     this._addStartObjects(WorldObjectTypes.Animal)
+    if (this.FoodCount !== CstWorld.StartAmount[WorldObjectTypes.Food]) debugger
   }
 
   GetPlace(x: number, y: number) {
@@ -81,6 +83,7 @@ export default class World {
 
   AddObject(worldObject: WorldObject) {
     try {
+      if (this._Places[worldObject.WorldY][worldObject.WorldX]?.Exist) debugger
       this._Places[worldObject.WorldY][worldObject.WorldX] = worldObject
       this._Items.push(worldObject)
     } catch (ex) {
@@ -93,17 +96,17 @@ export default class World {
   }
 
 
-  RandomUnoccupiedCoord(notX = 0, notY = 0) {
+  RandomUnoccupiedCoord(notX = 0, notY = 0): { x: number, y: number } {
     const { x, y } = RandomCoord(this.SizeX, this.SizeY)
     // check for existing world object
     const checkOccupied = this._Places[y][x]
-    if (checkOccupied && checkOccupied.Exist) this.RandomUnoccupiedCoord(notX, notY)
+    if (checkOccupied?.Exist)
+      return this.RandomUnoccupiedCoord()
     // extra check : use case new food must not be at original place (animal has'nt moved yet)    
-    if (x === notX && y === notY) this.RandomUnoccupiedCoord(notX, notY)
+    if (x === notX && y === notY)
+      return this.RandomUnoccupiedCoord(notX, notY)
     return { x, y }
   }
-
-
   Guard(x: number, y: number) {
     let checkedX = x
     let checkedY = y
@@ -113,6 +116,30 @@ export default class World {
     if (y > this.SizeY - 1) checkedY = this.SizeY - 1
 
     return { checkedX, checkedY }
+  }
+
+  FindTarget(animal: Animal, targetType: WorldObjectTypes) {
+    const foundItems = this._Items.filter(item => item.Exist && item.Type === targetType)
+    animal.ClosestTarget(foundItems)
+  }
+  AllExistingAnimals() {
+    const animals = this._Items.filter(item => item.Exist && item.Type === WorldObjectTypes.Animal)
+    return animals as Animal[]
+  }
+  get AnimalCount() {
+    return this.AllExistingAnimals().length
+  }
+  get FoodCount() {
+    const foods = this._Items.filter(item => item.Exist && item.Type === WorldObjectTypes.Food)
+    let testCount = 0
+    for (let y = 0; y < this.SizeY; y++) {
+
+      for (let x = 0; x < this.SizeX; x++) {
+        if (this._Places[y][x]?.Type === WorldObjectTypes.Food) testCount += 1
+      }
+    }
+    if (testCount !== foods.length) debugger
+    return foods.length
   }
 
   Thick() {
@@ -125,8 +152,9 @@ export default class World {
         // remove World object that has just stop existing in this thick 
         if (!worldObject.Exist) { this._Places[orgY][orgX] = null }
 
-        // check & execute movement
+        // setup next movement
         if (worldObject.IsMoveable) {
+          // if (worldObject.WorldX !== orgX || worldObject.WorldY !== orgY) {
           // TODO generic type of moveable object instead of animal ?
           const animal = worldObject as Animal
 
@@ -154,7 +182,7 @@ export default class World {
             this.FindTarget(animal, WorldObjectTypes.Water)
           }
 
-          animal.DirectionToTarget()
+          // animal.DirectionToTarget()
 
           // offspring
           if (animal.Energy > CstAnimal.OffspringThresholdEnergy) {
@@ -165,39 +193,20 @@ export default class World {
             this.AddObject(offspring)
           }
         }
-
-
-        // if (worldObject.Energy !== undefined && worldObject.Energy <= 0) { 
-        //   this._Places[orgY][orgX] = null }
-
       }
     })
   }
 
-  FindTarget(animal: Animal, targetType: WorldObjectTypes) {
-    const foundItems = this._Items.filter(item => item.Exist && item.Type === targetType)
-    animal.ClosestTarget(foundItems)
-  }
-  AllExistingAnimals() {
-    const animals = this._Items.filter(item => item.Exist && item.Type === WorldObjectTypes.Animal)
-    return animals as Animal[]
-  }
-  get AnimalCount() {
-    return this.AllExistingAnimals().length
-  }
+
 
   private collisionDetected(occupied: IWorldObject, animal: Animal, orgX: number, orgY: number) {
     // cancel move
     animal.WorldX = orgX
     animal.WorldY = orgY
-    // start wandering in the hope to move around the obstacle 
-    animal.Movement.StartWandering()
+
 
     // collision with Food --> eat food (add energy, remove this food, add new food)
     if (occupied.Type === WorldObjectTypes.Food) {
-
-      //      animal.Movement.Stop() // trigger new target next thick
-
       const food = occupied as Food
       animal.Eat(food.Energy)
       food.Eaten()
@@ -213,6 +222,9 @@ export default class World {
     if (occupied.Type === WorldObjectTypes.Water) {
       animal.Drink()
     }
+
+    // start wandering in the hope to move around the obstacle 
+    animal.Movement.StartWandering()
   }
 
 }
