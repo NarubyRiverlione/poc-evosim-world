@@ -62,14 +62,15 @@ export default class World {
       this.AddObject(newWorldObject)
     }
   }
+  private _newId(type: WorldObjectTypes) {
+    return this._Items.filter(item => item.Type === type).length
+  }
 
   Seed() {
     this._addStartObjects(WorldObjectTypes.Mountain)
     this._addStartObjects(WorldObjectTypes.Water)
     this._addStartObjects(WorldObjectTypes.Food)
-    if (this.FoodCount !== CstWorld.StartAmount[WorldObjectTypes.Food]) debugger
     this._addStartObjects(WorldObjectTypes.Animal)
-    if (this.FoodCount !== CstWorld.StartAmount[WorldObjectTypes.Food]) debugger
   }
 
   GetPlace(x: number, y: number) {
@@ -83,7 +84,7 @@ export default class World {
 
   AddObject(worldObject: WorldObject) {
     try {
-      if (this._Places[worldObject.WorldY][worldObject.WorldX]?.Exist) debugger
+      //  if (this._Places[worldObject.WorldY][worldObject.WorldX]?.Exist) debugger
       this._Places[worldObject.WorldY][worldObject.WorldX] = worldObject
       this._Items.push(worldObject)
     } catch (ex) {
@@ -131,14 +132,14 @@ export default class World {
   }
   get FoodCount() {
     const foods = this._Items.filter(item => item.Exist && item.Type === WorldObjectTypes.Food)
-    let testCount = 0
-    for (let y = 0; y < this.SizeY; y++) {
+    // let testCount = 0
+    // for (let y = 0; y < this.SizeY; y++) {
 
-      for (let x = 0; x < this.SizeX; x++) {
-        if (this._Places[y][x]?.Type === WorldObjectTypes.Food) testCount += 1
-      }
-    }
-    if (testCount !== foods.length) debugger
+    //   for (let x = 0; x < this.SizeX; x++) {
+    //     if (this._Places[y][x]?.Type === WorldObjectTypes.Food) testCount += 1
+    //   }
+    // }
+    // if (testCount !== foods.length) debugger
     return foods.length
   }
 
@@ -182,22 +183,18 @@ export default class World {
             this.FindTarget(animal, WorldObjectTypes.Water)
           }
 
-          // animal.DirectionToTarget()
-
           // offspring
           if (animal.Energy > CstAnimal.OffspringThresholdEnergy) {
             // new animal spawn at parent previous place
             //  (safe, unoccupied because parent came for that direction ?)    
-            const newId = this._Items.filter(item => item.Type === WorldObjectTypes.Animal).length
-            const offspring = animal.CreateOffspring(orgX, orgY, newId)
+            const newAnimalId = this._newId(WorldObjectTypes.Animal)
+            const offspring = animal.CreateOffspring(orgX, orgY, newAnimalId)
             this.AddObject(offspring)
           }
         }
       }
     })
   }
-
-
 
   private collisionDetected(occupied: IWorldObject, animal: Animal, orgX: number, orgY: number) {
     // cancel move
@@ -214,7 +211,8 @@ export default class World {
       this._Places[occupied.WorldY][occupied.WorldX] = null
       //  add new food 
       const { x, y } = this.RandomUnoccupiedCoord(orgX, orgY)
-      const newFood = new Food({ WorldX: x, WorldY: y, Id: this._Items.length })
+      const newFoodId = this._newId(WorldObjectTypes.Water)
+      const newFood = new Food({ WorldX: x, WorldY: y, Id: newFoodId })
       this.AddObject(newFood)
     }
 

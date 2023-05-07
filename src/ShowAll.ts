@@ -23,7 +23,7 @@ export function ClearScreen(simThick: number, animalsCount: number, foodCount: n
 }
 
 export function ShowAll(world: World) {
-  let testCount = 0
+
   for (let y = 0; y < world.SizeY; y++) {
     let showRow = ''
     for (let x = 0; x < world.SizeX; x++) {
@@ -38,7 +38,7 @@ export function ShowAll(world: World) {
         case WorldObjectTypes.Mountain:
           showRow = `${showRow}MMMMM`; break
         case WorldObjectTypes.Food:
-          showRow = `${showRow}*${Id}*`; testCount += 1; break
+          showRow = `${showRow}*${Id}*`; break
         default:
           showRow = `${showRow} ${Id} `
       }
@@ -48,8 +48,6 @@ export function ShowAll(world: World) {
   }
 
   process.stdout.write('\n\n')
-  process.stdout.write(testCount + '\n')
-
 }
 
 export function ShownAnimals(world: World) {

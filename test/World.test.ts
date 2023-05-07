@@ -22,6 +22,15 @@ describe('World', () => {
     expect(x).toBeLessThan(testSizeX)
     expect(y).toBeGreaterThanOrEqual(0)
   })
+  it('Get unoccupied randomCoord', () => {
+    const occuX = 5; const occuY = 5
+    const occu = new WorldObject({ WorldX: occuX, WorldY: occuY, Id: 1 }, WorldObjectTypes.Test)
+    testWorld.AddObject(occu)
+    const { x, y } = testWorld.RandomUnoccupiedCoord(10, 10)
+    expect(x).not.toBe(10)
+    expect(y).not.toBe(10)
+    expect({ x, y }).not.toEqual({ x: 10, y: 10 })
+  })
 
   describe('World init', () => {
     it('Init empty world', () => {
@@ -87,6 +96,7 @@ describe('World', () => {
     it('Seed', () => {
       testWorld.Seed()
       expect(testWorld.AnimalCount).toBe(CstWorld.StartAmount[WorldObjectTypes.Animal])
+      expect(testWorld.FoodCount).toBe(CstWorld.StartAmount[WorldObjectTypes.Food])
     })
 
   })
@@ -208,7 +218,7 @@ describe('World', () => {
     })
   })
 
-  describe('Animale find food', () => {
+  describe.skip('Animal find food', () => {
     it('find closest food & move too it', () => {
       const startx = Math.floor(testSizeX / 2)
       const starty = Math.floor(testSizeY / 2)

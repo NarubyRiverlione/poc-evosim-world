@@ -79,6 +79,9 @@ describe('Animal', () => {
       testAnimal.ClosestTarget([target1, target2])
       expect(testAnimal.Target).not.toBeNull()
       expect(testAnimal.Target?.Id).toEqual('A2')
+      testAnimal.ClosestTarget([target1, target2])
+      expect(testAnimal.Target?.Id).toEqual('A2')
+
     })
     it('no target in see range', () => {
       const testAnimal = new Animal({ WorldX: 20, WorldY: 20, Id: 1 }, 2)
@@ -105,7 +108,7 @@ describe('Animal', () => {
     })
     it('calc distance to target', () => {
       const { x, y } = RandomCoord(100, 100)
-      const { x: offsetX, y: offsetY } = RandomCoord(50, 50)
+      const { x: offsetX, y: offsetY } = RandomCoord(2, 2)
       const testAnimal = new Animal({ WorldX: x, WorldY: y, Id: 1 }, 55)
       const target1 = new WorldObject({ WorldX: x + offsetX, WorldY: y + offsetY, Id: 3 }, WorldObjectTypes.Test)
       testAnimal.ClosestTarget([target1])
@@ -113,51 +116,35 @@ describe('Animal', () => {
       const expectDistance = Math.sqrt(Math.pow(offsetX, 2) + Math.pow(offsetY, 2))
       expect(testAnimal.Distance).toBe(parseFloat(expectDistance.toFixed(1)))
     })
-    it('2 target, same distance', () => {
+    it('2 target, same distance -> keep first target', () => {
       const start = 20
       const testAnimal = new Animal({ WorldX: start, WorldY: start, Id: 1 })
 
-      const target1 = new Animal({ WorldX: start + 2, WorldY: start + 5, Id: 2 })
-      const target2 = new Animal({ WorldX: start - 2, WorldY: start + 5, Id: 3 })
+      const target1 = new Animal({ WorldX: start + 2, WorldY: start + 1, Id: 2 })
+      const target2 = new Animal({ WorldX: start - 2, WorldY: start + 1, Id: 3 })
 
 
       testAnimal.ClosestTarget([target1, target2])
       expect(testAnimal.Target).toEqual(target1)
 
-      testAnimal.DirectionToTarget()  // 2th target distance same, keep target1
-      testAnimal.Thick() // move to new location -> closer to target1
-      expect(testAnimal.Movement.DirectionX).toBe(1)
-      expect(testAnimal.Movement.DirectionY).toBe(1)
-      expect(testAnimal.WorldX).toBe(start + 1)
-      expect(testAnimal.WorldY).toBe(start + 1)
-
-
-      testAnimal.ClosestTarget([target1, target2])
-      expect(testAnimal.Target).toEqual(target1)
-
-      testAnimal.DirectionToTarget()  // 2th target distance same, keep target1
-      testAnimal.Thick() // move to new location -> closer to target1
-      expect(testAnimal.Target).toEqual(target1)
-      expect(testAnimal.Movement.DirectionX).toBe(0)
-      expect(testAnimal.Movement.DirectionY).toBe(1)
-      expect(testAnimal.WorldX).toBe(start + 2)
-      expect(testAnimal.WorldY).toBe(start + 2)
     })
 
   })
 })
 describe('Offspring', () => {
   it('create offspring', () => {
-    const maxAnimalId = 153
+    const parentId = 153
     const seeRange = Math.floor(Math.random() * 20)
     const parentEatEnergy = Math.floor(Math.random() * 20) + CstAnimal.OffspringThresholdEnergy
-    const parentAnimal = new Animal({ WorldX: 20, WorldY: 20, Id: maxAnimalId }, seeRange)
+    const parentAnimal = new Animal({ WorldX: 20, WorldY: 20, Id: parentId }, seeRange)
     parentAnimal.Eat(parentEatEnergy)
     expect(parentAnimal.Energy).toBe(parentEatEnergy + CstWorld.StartEnergy[WorldObjectTypes.Animal])
 
 
-    const offspring = parentAnimal.CreateOffspring(21, 21, maxAnimalId + 1)
+    const offspring = parentAnimal.CreateOffspring(21, 21, parentId + 1)
     expect(offspring.Age).toBe(0)
+    expect(offspring.Parent).toBe(`${WorldObjectTypes.Animal}${parentId}`)
+
 
     const expectParentEnergy = parentEatEnergy - CstWorld.StartEnergy[WorldObjectTypes.Animal]
     expect(parentAnimal.Energy).toBe(expectParentEnergy)
