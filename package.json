@@ -4,7 +4,7 @@
   "description": "EvoSim Starter World",
   "main": "dist/src/index.js",
   "scripts": {
-    "start": "NODE_ENV=production node dist/src/index.js",
+    "start": "cross-env NODE_ENV=production node dist/src/index.js",
     "build": "tsc -p .",
     "tsc": "tsc -w",
     "lint": "eslint --fix src",
@@ -20,6 +20,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "cross-env": "^7.0.3",
     "dotenv": "^16.0.3"
   },
   "devDependencies": {

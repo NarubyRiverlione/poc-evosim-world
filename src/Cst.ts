@@ -10,7 +10,7 @@ export const CstWorld = {
     [WorldObjectTypes.Test]: 0,
   },
   StartEnergy: {
-    [WorldObjectTypes.Food]: 20,
+    [WorldObjectTypes.Food]: 10,
     [WorldObjectTypes.Animal]: 20,
     [WorldObjectTypes.Water]: 0,
     [WorldObjectTypes.Mountain]: 0,
