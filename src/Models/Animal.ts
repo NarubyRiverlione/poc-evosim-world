@@ -20,7 +20,7 @@ export default class Animal extends WorldObject {
 
   constructor(startValues: WorldObjectStart, seeRange = CstAnimal.SeeRange, parentId?: string) {
     super(startValues, WorldObjectTypes.Animal, true)
-    // default behavior is start wandering
+
     this.Movement = new Movement(CstAnimal.RandomSteps)
     this._seeRange = seeRange
     this._target = null
@@ -42,32 +42,31 @@ export default class Animal extends WorldObject {
     // thirst above threshold: movement cost more energy
     this.Energy -= CstAnimal.MoveEnergy * ThirstEnergyFactor(this.Thirst, CstAnimal.ThirstThreshold)
     this._thirst += CstAnimal.ThirstThick
-
+    this.DirectionToTarget()
     super.Thick()
   }
 
+  get Parent() { return this._parentId }
   get Distance(): number {
-    return parseInt(this._closestDistance.toFixed(1))
+    return parseFloat(this._closestDistance.toFixed(1))
   }
 
   Eat(addEnergy: number) {
     this.Energy += addEnergy
+    this._target = null
   }
   Drink() {
     this._thirst = 0
+    this._target = null
   }
-  CreateOffspring(newId: number): Animal {
-    // new animal spawn after parent (safe, unoccupied because parent came for that direction ?)    
-    const x = this.WorldX - this.Movement?.DirectionX
-    const y = this.WorldY - this.Movement?.DirectionY
-
+  CreateOffspring(x: number, y: number, newId: number): Animal {
     // TODO mutation SeeRange
     const newSeeRange = this.SeeRange
 
     const offspring = new Animal({ WorldX: x, WorldY: y, Id: newId }, newSeeRange, this.Id)
 
     // remove energy from parent to prevent continues offspring creation
-    this.Energy -= CstWorld.StartEnergy[WorldObjectTypes.Animal]
+    this.Energy -= CstWorld.StartEnergy[WorldObjectTypes.Animal] * 2
 
     return offspring
   }
@@ -79,7 +78,7 @@ export default class Animal extends WorldObject {
     }
     if (!this._target) {
       // console.debug('no target to determine direction, start wandering')
-      this.Movement.IsWandering = true
+      this.Movement.StartWandering()
       return
     }
 
@@ -87,6 +86,10 @@ export default class Animal extends WorldObject {
   }
 
   ClosestTarget(targets: WorldObject[]) {
+    // as long target exist, don't look for new one (prevent flip-flop)
+    if (this._target && this._target?.Exist) return
+
+
     this._closestDistance = 0
     this._target = null
 

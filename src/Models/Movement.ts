@@ -57,7 +57,6 @@ export default class Movement implements IMovement {
   }
 
   DirectionToGoal(currentX: number, currentY: number, goalX: number, goalY: number) {
-
     //  actions after collision are done in World thick
     // this "above" other item should 'never' happen
     if (currentX === goalX && currentY === goalY) {
